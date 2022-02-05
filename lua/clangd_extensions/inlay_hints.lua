@@ -1,17 +1,17 @@
 local M = {}
 local utils = require("clangd_extensions.utils")
-local config = require("rust-tools.config")
+local config = require("clangd_extensions.config")
 
 -- Update inlay hints when opening a new buffer and when writing a buffer to a
 -- file
 -- opts is a string representation of the table of options
 function M.setup_autocmd()
     local events = "BufEnter,BufWinEnter,TabEnter,BufWritePost"
-    if config.options.tools.inlay_hints.only_current_line then
+    if config.options.extensions.inlay_hints.only_current_line then
         events = string.format(
             "%s,%s",
             events,
-            config.options.tools.inlay_hints.only_current_line_autocmd
+            config.options.extensions.inlay_hints.only_current_line_autocmd
         )
     end
 
@@ -65,7 +65,7 @@ local enabled = nil
 --
 local function parseHints(result)
     local map = {}
-    local only_current_line = config.options.tools.inlay_hints.only_current_line
+    local only_current_line = config.options.extensions.inlay_hints.only_current_line
 
     if type(result) ~= "table" then
         return {}
@@ -99,7 +99,7 @@ local function handler(err, result, ctx)
     if err then
         return
     end
-    local opts = config.options.tools.inlay_hints
+    local opts = config.options.extensions.inlay_hints
     local bufnr = ctx.bufnr
 
     if vim.api.nvim_get_current_buf() ~= bufnr then
@@ -169,26 +169,26 @@ local function handler(err, result, ctx)
                 end
             end
 
-            if config.options.tools.inlay_hints.right_align then
+            if config.options.extensions.inlay_hints.right_align then
                 virt_text = virt_text
-                    .. string.rep(" ", config.options.tools.inlay_hints.right_align_padding)
+                    .. string.rep(" ", config.options.extensions.inlay_hints.right_align_padding)
             end
 
-            if config.options.tools.inlay_hints.max_len_align then
+            if config.options.extensions.inlay_hints.max_len_align then
                 virt_text = string.rep(
                     " ",
                     max_len
                         - current_line_len
-                        + config.options.tools.inlay_hints.max_len_align_padding
+                        + config.options.extensions.inlay_hints.max_len_align_padding
                 ) .. virt_text
             end
 
             -- set the virtual text
             vim.api.nvim_buf_set_extmark(bufnr, namespace, line, 0, {
-                virt_text_pos = config.options.tools.inlay_hints.right_align and "right_align"
+                virt_text_pos = config.options.extensions.inlay_hints.right_align and "right_align"
                     or "eol",
                 virt_text = {
-                    { virt_text, config.options.tools.inlay_hints.highlight },
+                    { virt_text, config.options.extensions.inlay_hints.highlight },
                 },
                 hl_mode = "combine",
             })

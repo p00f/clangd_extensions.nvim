@@ -10,3 +10,15 @@ end, {})
 defcmd("ClangdToggleInlayHints", function()
     require("clangd_extensions.inlay_hints").toggle_inlay_hints()
 end, {})
+
+defcmd("ClangdAST", function(args)
+    require("clangd_extensions.ast").display_ast(args.line1, args.line2)
+end, { range = true })
+
+defcmd("ClangdTypeHeirarchy", function()
+    require("clangd_extensions.type_heirarchy").show_heirarchy()
+end, {})
+
+defcmd("ClangdSymbolInfo", function()
+    require("clangd_extensions.symbol_info").show_symbol_info()
+end, {})
