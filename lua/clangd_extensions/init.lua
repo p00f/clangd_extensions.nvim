@@ -19,6 +19,9 @@ function M.setup(opts)
     end
     -- Call lspconfig setup
     require("lspconfig").clangd.setup(config.options.server)
+
+    __CLANGD_SOURCE_AST_BUFS = {}
+    __CLANGD_NSID = vim.api.nvim_create_namespace("clangd_extensions")
 end
 
 return M
