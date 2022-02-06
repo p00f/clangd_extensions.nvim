@@ -1,7 +1,7 @@
 local utils = require("clangd_extensions.utils")
 
 local function handler(err, result)
-    if err then
+    if err or (#result == 0) then
         return
     end
     local name_str = string.format("name: %s", result[1].name)

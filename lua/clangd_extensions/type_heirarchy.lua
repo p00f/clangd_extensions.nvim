@@ -30,7 +30,7 @@ local function format_tree(node, visited, result, padding)
 end
 
 local function handler(err, TypeHierarchyItem)
-    if err then
+    if err or not TypeHierarchyItem then
         return
     else
         local lines = format_tree(TypeHierarchyItem, {}, {}, "")
