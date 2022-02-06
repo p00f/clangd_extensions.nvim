@@ -23,6 +23,13 @@ defcmd("ClangdSymbolInfo", function()
     require("clangd_extensions.symbol_info").show_symbol_info()
 end, {})
 
-defcmd("ClangdMemoryUsage", function()
-    require("clangd_extensions.memory_usage").memory_usage()
-end, {})
+defcmd("ClangdMemoryUsage", function(args)
+    require("clangd_extensions.memory_usage").show_memory_usage(
+        args.args == "expand_preamble" and true or false
+    )
+end, {
+    nargs = "?",
+    complete = function()
+        return { "expand_preamble" }
+    end,
+})

@@ -1,5 +1,6 @@
 local utils = require("clangd_extensions.utils")
 local api = vim.api
+local fmt = string.format
 
 local function display(lines)
     for k, line in pairs(lines) do -- Pad lines
@@ -36,61 +37,68 @@ local function display(lines)
     })
 end
 
-local function handler(err, result)
-    if err then
-        return
+local function format_name(name)
+    if name:sub(1, 7) == "file://" then
+        name = vim.uri_to_fname(name)
     end
-    local disp = { "" }
-    table.insert(disp, "Total: " .. result._total)
-    table.insert(disp, "  Clangd server: " .. result.clangd_server._total)
-    table.insert(disp, "    Background index: " .. result.clangd_server.background_index._total)
-    table.insert(disp, "    Dynamic index: " .. result.clangd_server.dynamic_index._total)
-    table.insert(disp, "      Main file: " .. result.clangd_server.dynamic_index.main_file._total)
-    table.insert(
-        disp,
-        "        Index: " .. result.clangd_server.dynamic_index.main_file.index._self
-    )
-    if result.clangd_server.dynamic_index.main_file.slabs then
-        table.insert(
-            disp,
-            "        Slabs: " .. result.clangd_server.dynamic_index.main_file.slabs._total
-        )
-        for k, v in pairs(result.clangd_server.dynamic_index.main_file.slabs) do
-            if k ~= "_self" and k ~= "_total" then
-                table.insert(disp, string.format("          %s: %s", vim.uri_to_fname(k), v._total))
-                table.insert(disp, string.format("            References: %s", v.references._self))
-                table.insert(disp, string.format("            Relations: %s", v.relations._self))
-                table.insert(disp, string.format("            Symbols: %s", v.symbols._self))
+    local cwd = vim.fn.getcwd()
+    if name:sub(1, string.len(cwd)) == cwd then
+        name = name:sub(string.len(cwd) + 2, -1)
+    end
+    return name
+end
+
+local function format_tree(node, visited, result, padding, prefix, expand_preamble)
+    if padding == "" then
+        table.insert(result, fmt("Total: self = %s, total = %s", node._self, node._total))
+    end
+    visited[prefix] = true
+    for child_name, child_node in pairs(node) do
+        if
+            child_name ~= "_self"
+            and child_name ~= "_total"
+            and not visited[prefix .. child_name]
+        then
+            child_name = format_name(child_name)
+            table.insert(
+                result,
+                padding
+                    .. fmt(
+                        "%s: self = %s, total = %s",
+                        child_name,
+                        child_node._self,
+                        child_node._total
+                    )
+            )
+            if child_name ~= "preamble" or expand_preamble then
+                format_tree(
+                    child_node,
+                    visited,
+                    result,
+                    padding .. "  ",
+                    prefix .. child_name,
+                    expand_preamble
+                )
             end
         end
     end
-    table.insert(disp, "      Preamble: " .. result.clangd_server.dynamic_index.preamble._total)
-    table.insert(
-        disp,
-        "        Index: " .. result.clangd_server.dynamic_index.preamble.index._total
-    )
-    table.insert(
-        disp,
-        "        Slabs: " .. result.clangd_server.dynamic_index.preamble.slabs._total
-    )
-    table.insert(disp, "    tuscheduler: " .. result.clangd_server.tuscheduler._total)
-    table.insert(
-        disp,
-        "      Header includer cache: "
-            .. result.clangd_server.tuscheduler.header_includer_cache._total
-    )
-    for k, v in pairs(result.clangd_server.tuscheduler) do
-        if k ~= "header_includer_cache" and k ~= "_self" and k ~= "_total" then
-            table.insert(disp, string.format("    %s: %s", k, v._total))
-            table.insert(disp, string.format("      AST: %s", v.ast._total))
-            table.insert(disp, string.format("      Preamble: %s", v.preamble._total))
-        end
+    return result
+end
+
+local function handler(err, result, expand_preamble)
+    if err then
+        return
     end
+    local disp = format_tree(result, {}, { "" }, "", "", expand_preamble)
     display(disp)
 end
 
 local M = {}
-function M.memory_usage()
-    utils.request(0, "$/memoryUsage", nil, handler)
+
+function M.show_memory_usage(expand_preamble)
+    utils.request(0, "$/memoryUsage", nil, function(err, result)
+        handler(err, result, expand_preamble)
+    end)
 end
+
 return M
