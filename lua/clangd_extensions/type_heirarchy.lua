@@ -37,7 +37,11 @@ local function handler(err, TypeHierarchyItem)
         vim.cmd(fmt([[split %s:\ type\ heirarchy]], TypeHierarchyItem.name))
         api.nvim_buf_set_lines(0, 0, -1, true, lines)
         vim.bo.buftype = "nofile"
-        -- api.nvim_buf_set_name(0, TypeHierarchyItem.name .. ": type heirarchy")
+        vim.bo.modifiable = false
+        api.nvim_win_set_option(0, "number", false)
+        api.nvim_win_set_option(0, "relativenumber", false)
+        api.nvim_win_set_option(0, "spell", false)
+        api.nvim_win_set_option(0, "cursorline", false)
     end
 end
 
