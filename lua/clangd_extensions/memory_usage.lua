@@ -89,8 +89,7 @@ local function handler(err, result, expand_preamble)
     if err then
         return
     end
-    local disp = format_tree(result, {}, { "" }, "", "", expand_preamble)
-    display(disp)
+    display(format_tree(result, {}, { "" }, "", "", expand_preamble))
 end
 
 local M = {}

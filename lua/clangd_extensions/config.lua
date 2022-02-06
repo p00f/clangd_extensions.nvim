@@ -18,9 +18,7 @@ local defaults = {
         },
     },
 
-    server = {
-        -- standalone = true,
-    },
+    server = {},
 }
 
 M.options = {}
