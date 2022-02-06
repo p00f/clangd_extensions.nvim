@@ -38,21 +38,21 @@ local function describe(role, kind, detail)
     return icon_prefix(role) .. str
 end
 
-local function format_tree(node, visited, result, padding, hl_bufs)
+local function walk_tree(node, visited, result, padding, hl_bufs)
     visited[node] = true
     table.insert(result, padding .. describe(node.role, node.kind, node.detail))
 
     if node.range then
-        table.insert(__CLANGD_SOURCE_AST_BUFS[hl_bufs.source_buf][hl_bufs.ast_buf], {
+        __CLANGD_SOURCE_AST_BUFS[hl_bufs.source_buf][hl_bufs.ast_buf][#result] = {
             start = { node["range"]["start"]["line"], node["range"]["start"]["character"] },
             ["end"] = { node["range"]["end"]["line"], node["range"]["end"]["character"] },
-        })
+        }
     end
 
     if node.children then
         for _, child in pairs(node.children) do
             if not visited[child] then
-                format_tree(child, visited, result, padding .. "  ", hl_bufs)
+                walk_tree(child, visited, result, padding .. "  ", hl_bufs)
             end
         end
     end
@@ -86,16 +86,18 @@ function M.update_highlight(source_buf, ast_buf)
     end
     local curline = vim.fn.getcurpos()[2]
     local curline_ranges = __CLANGD_SOURCE_AST_BUFS[source_buf][ast_buf][curline]
-    vim.highlight.range(
-        source_buf,
-        __CLANGD_NSID,
-        "Search",
-        curline_ranges.start,
-        curline_ranges["end"],
-        "v",
-        false,
-        110
-    )
+    if curline_ranges then
+        vim.highlight.range(
+            source_buf,
+            __CLANGD_NSID,
+            "Search",
+            curline_ranges.start,
+            curline_ranges["end"],
+            "v",
+            false,
+            110
+        )
+    end
 end
 
 local function handler(err, ASTNode)
@@ -110,13 +112,7 @@ local function handler(err, ASTNode)
         end
         __CLANGD_SOURCE_AST_BUFS[source_buf][ast_buf] = {}
 
-        local lines = format_tree(
-            ASTNode,
-            {},
-            {},
-            "",
-            { source_buf = source_buf, ast_buf = ast_buf }
-        )
+        local lines = walk_tree(ASTNode, {}, {}, "", { source_buf = source_buf, ast_buf = ast_buf })
         api.nvim_buf_set_lines(0, 0, -1, true, lines)
         vim.bo.buftype = "nofile"
         vim.bo.modifiable = false
