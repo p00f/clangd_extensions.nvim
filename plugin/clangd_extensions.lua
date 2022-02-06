@@ -22,3 +22,7 @@ end, {})
 defcmd("ClangdSymbolInfo", function()
     require("clangd_extensions.symbol_info").show_symbol_info()
 end, {})
+
+defcmd("ClangdMemoryUsage", function()
+    require("clangd_extensions.memory_usage").memory_usage()
+end, {})
