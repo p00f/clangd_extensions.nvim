@@ -1,7 +1,7 @@
 # Implementation status of [extensions](https://clangd.llvm.org/extensions)
  - [ ] Memory usage
  - [ ] AST
- - [ ] Symbol info request
+ - [x] Symbol info request (implemented)
  - [x] Type hierarchy (implemented)
  - [x] Inlay hints (implemented)
  - [x] Switch between source/header (nvim-lspconfig already does this)
