@@ -78,11 +78,7 @@ See how ranges are handled at https://clangd.llvm.org/extensions#ast
  - [x] Switch between source/header (nvim-lspconfig already does this)
  - [x] File status (see lsp-status.nvim)
  - [x] Compilation commands (can be specified in lspconfig `init_options`)
-
- I'm not sure if the below are in scope or even possible:
- - [ ] Force diagnostics generation (look into this)
- - [ ] Code completion scores (look into this)
- - [ ] Diagnostic categories
- - [ ] Inline fixes for diagnostics
+ - [ ] Code completion scores (can be done using cmp comparators)
+ - [ ] Force diagnostics generation (not sure)
 ## Credits
 [simrat39](https://github.com/simrat39) - the code for inlay hints was taken from [rust-tools.nvim](https://github.com/simrat39/rust-tools.nvim) with very minor changes.
