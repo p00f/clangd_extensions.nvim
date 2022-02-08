@@ -35,13 +35,22 @@ local function handler(err, TypeHierarchyItem)
     else
         local lines = format_tree(TypeHierarchyItem, {}, {}, "")
         vim.cmd(fmt([[split %s:\ type\ heirarchy]], TypeHierarchyItem.name))
-        api.nvim_buf_set_lines(0, 0, -1, true, lines)
+        local bufnr = vim.api.nvim_get_current_buf()
+        api.nvim_buf_set_lines(bufnr, 0, -1, true, lines)
         vim.bo.buftype = "nofile"
         vim.bo.modifiable = false
         api.nvim_win_set_option(0, "number", false)
         api.nvim_win_set_option(0, "relativenumber", false)
         api.nvim_win_set_option(0, "spell", false)
         api.nvim_win_set_option(0, "cursorline", false)
+        vim.cmd(string.format(
+            [[
+        augroup ClangdWin
+        autocmd QuitPre <buffer=%s> bwipeout
+        augroup END
+        ]],
+            bufnr
+        ))
     end
 end
 
