@@ -1,4 +1,3 @@
-local utils = require("clangd_extensions.utils")
 local fmt = string.format
 local api = vim.api
 
@@ -93,10 +92,10 @@ local function handler(err, ASTNode)
         api.nvim_buf_set_lines(ast_buf, 0, -1, true, lines)
         vim.bo.buftype = "nofile"
         vim.bo.modifiable = false
-        api.nvim_win_set_option(ast_buf, "number", false)
-        api.nvim_win_set_option(ast_buf, "relativenumber", false)
-        api.nvim_win_set_option(ast_buf, "spell", false)
-        api.nvim_win_set_option(ast_buf, "cursorline", false)
+        api.nvim_win_set_option(0, "number", false)
+        api.nvim_win_set_option(0, "relativenumber", false)
+        api.nvim_win_set_option(0, "spell", false)
+        api.nvim_win_set_option(0, "cursorline", false)
         vim.cmd(string.format(
             [[
         augroup ClangdWin
@@ -140,7 +139,7 @@ function M.update_highlight(source_buf, ast_buf)
 end
 
 function M.display_ast(line1, line2)
-    utils.request(0, "textDocument/ast", {
+    vim.lsp.buf_request(0, "textDocument/ast", {
         textDocument = { uri = vim.uri_from_bufnr(0) },
         range = {
             start = {

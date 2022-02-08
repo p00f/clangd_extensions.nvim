@@ -1,4 +1,3 @@
-local utils = require("clangd_extensions.utils")
 local symbol_kind = require("clangd_extensions.symbol_kind")
 local fmt = string.format
 local api = vim.api
@@ -55,7 +54,7 @@ local function handler(err, TypeHierarchyItem)
 end
 
 function M.show_heirarchy()
-    utils.request(0, "textDocument/typeHierarchy", {
+    vim.lsp.buf_request(0, "textDocument/typeHierarchy", {
         textDocument = {
             uri = vim.uri_from_bufnr(0),
         },

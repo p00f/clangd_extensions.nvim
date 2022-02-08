@@ -21,7 +21,6 @@
 -- SOFTWARE.
 
 local M = {}
-local utils = require("clangd_extensions.utils")
 local config = require("clangd_extensions.config")
 
 -- Update inlay hints when opening a new buffer and when writing a buffer to a
@@ -237,7 +236,7 @@ end
 
 -- Sends the request to clangd to get the inlay hints and handle them
 function M.set_inlay_hints()
-    utils.request(0, "clangd/inlayHints", get_params(), handler)
+    vim.lsp.buf_request(0, "clangd/inlayHints", get_params(), handler)
 end
 
 return M

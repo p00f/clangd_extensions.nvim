@@ -1,4 +1,3 @@
-local utils = require("clangd_extensions.utils")
 local api = vim.api
 local fmt = string.format
 
@@ -103,7 +102,7 @@ end
 local M = {}
 
 function M.show_memory_usage(expand_preamble)
-    utils.request(0, "$/memoryUsage", nil, function(err, result)
+    vim.lsp.buf_request(0, "$/memoryUsage", nil, function(err, result)
         handler(err, result, expand_preamble)
     end)
 end

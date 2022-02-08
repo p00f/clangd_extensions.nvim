@@ -1,5 +1,3 @@
-local utils = require("clangd_extensions.utils")
-
 local function handler(err, result)
     if err or (#result == 0) then
         return
@@ -17,7 +15,7 @@ end
 local M = {}
 
 function M.show_symbol_info()
-    utils.request(0, "textDocument/symbolInfo", {
+    vim.lsp.buf_request(0, "textDocument/symbolInfo", {
         textDocument = {
             uri = vim.uri_from_bufnr(0),
         },
