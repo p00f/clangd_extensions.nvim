@@ -29,7 +29,9 @@ function M.setup(opts)
     if config.options.extensions.autoSetHints then
         local old_func = config.options.server.on_attach
         config.options.server.on_attach = function(client, bufnr)
-            old_func(client, bufnr)
+            if old_func then
+                old_func(client, bufnr)
+            end
             require("clangd_extensions.inlay_hints").setup_autocmd()
             require("clangd_extensions.inlay_hints").set_inlay_hints()
             vim.cmd(commands)
