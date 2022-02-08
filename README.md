@@ -2,7 +2,7 @@
 
 ## Configuration:
 ```lua
-require("clangd_extensions.setup") {
+require("clangd_extensions").setup {
     server = {
         -- options to pass to nvim-lspconfig
         -- i.e. the arguments to require("lspconfig").clangd.setup({})
