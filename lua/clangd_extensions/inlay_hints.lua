@@ -40,7 +40,7 @@ function M.setup_autocmd()
     vim.api.nvim_command(
         "autocmd "
             .. events
-            .. ' *.c,*.cpp :lua require"clangd_extensions.inlay_hints".set_inlay_hints()'
+            .. ' <buffer> lua require"clangd_extensions.inlay_hints".set_inlay_hints()'
     )
     vim.api.nvim_command("augroup END")
 end
