@@ -65,10 +65,10 @@ See how ranges are handled at https://clangd.llvm.org/extensions#ast
 ![image](https://user-images.githubusercontent.com/36493671/152699367-dc928adf-d3ed-4e8e-a9d0-ca573f01c008.png)
 #### Usage
 `:ClangdSymbolInfo` with the cursor at the desired symbol.
-### [Type heirarchy](https://clangd.llvm.org/extensions#type-hierarchy)
+### [Type hierarchy](https://clangd.llvm.org/extensions#type-hierarchy)
 ![image](https://user-images.githubusercontent.com/36493671/152699475-cc920980-0af9-4eb3-852c-23f487eba2ae.png)
 #### Usage
-`:ClangdTypeHeirarchy` with the cursor over the desired type or a symbol of that type.
+`:ClangdTypeHierarchy` with the cursor over the desired type or a symbol of that type.
 
 ## Implementation status of [extensions](https://clangd.llvm.org/extensions)
  - [x] Memory usage (implemented)

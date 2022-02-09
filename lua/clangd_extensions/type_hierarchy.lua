@@ -33,7 +33,7 @@ local function handler(err, TypeHierarchyItem)
         return
     else
         local lines = format_tree(TypeHierarchyItem, {}, {}, "")
-        vim.cmd(fmt([[split %s:\ type\ heirarchy]], TypeHierarchyItem.name))
+        vim.cmd(fmt([[split %s:\ type\ hierarchy]], TypeHierarchyItem.name))
         local bufnr = vim.api.nvim_get_current_buf()
         api.nvim_buf_set_lines(bufnr, 0, -1, true, lines)
         vim.bo.buftype = "nofile"
@@ -53,7 +53,7 @@ local function handler(err, TypeHierarchyItem)
     end
 end
 
-function M.show_heirarchy()
+function M.show_hierarchy()
     vim.lsp.buf_request(0, "textDocument/typeHierarchy", {
         textDocument = {
             uri = vim.uri_from_bufnr(0),
