@@ -1,6 +1,7 @@
 ![clangd](https://user-images.githubusercontent.com/36493671/152692205-837ec826-54d0-4257-9894-cc1a7ac8a114.svg)
 
 ## Configuration:
+Remove the `require'lspconfig'.clangd.setup{}` from your config, this will be called automatically. Use the `server` field below to customize `setup{}`.
 ```lua
 require("clangd_extensions").setup {
     server = {
