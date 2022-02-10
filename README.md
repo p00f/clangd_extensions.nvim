@@ -25,7 +25,7 @@ require("clangd_extensions").setup {
             -- This option is only respected when only_current_line and
             -- autoSetHints both are true.
             only_current_line_autocmd = "CursorHold",
-            -- wheter to show parameter hints with the inlay hints or not
+            -- whether to show parameter hints with the inlay hints or not
             show_parameter_hints = true,
             -- whether to show variable name before type hints with the inlay hints or not
             show_variable_name = false,
@@ -44,6 +44,29 @@ require("clangd_extensions").setup {
             -- The color of the hints
             highlight = "Comment",
         },
+        ast = {
+            role_icons = {
+                type = "",
+                declaration = "",
+                expression = "",
+                specifier = "",
+                statement = "",
+                ["template argument"] = "",
+            },
+
+            kind_icons = {
+                Compound = "",
+                Recovery = "",
+                TranslationUnit = "",
+                PackExpansion = "",
+                TemplateTypeParm = "",
+                TemplateTemplateParm = "",
+                TemplateParamObject = "",
+            },
+
+            highlights = {
+                detail = "Comment",
+            },
     }
 }
 ```

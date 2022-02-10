@@ -1,5 +1,6 @@
 local fmt = string.format
 local api = vim.api
+local conf = require("clangd_extensions.config").options.extensions.ast
 
 local M = {}
 
@@ -19,17 +20,11 @@ local function setup_hl_autocmd(source_buf, ast_buf)
     ))
 end
 
-local function icon_prefix(role)
-    local tbl = {
-        type = "",
-        declaration = "",
-        expression = "",
-        specifier = "",
-        statement = "",
-        ["template argument"] = "",
-    }
-    if tbl[role] then
-        return tbl[role] .. "  "
+local function icon_prefix(role, kind)
+    if conf.kind_icons[kind] then
+        return conf.kind_icons[kind] .. "  "
+    elseif conf.role_icons[role] then
+        return conf.role_icons[role] .. "  "
     else
         return "   "
     end
@@ -37,7 +32,7 @@ end
 
 local function describe(role, kind, detail)
     local str = ""
-    local role_icon = icon_prefix(role)
+    local icon = icon_prefix(role, kind)
     local detailpos = nil
     str = str .. kind
     if
@@ -52,12 +47,12 @@ local function describe(role, kind, detail)
     end
     if detail then
         detailpos = {
-            start = string.len(str) + (role_icon == "   " and 0 or 2) + 4,
+            start = string.len(str) + (icon == "   " and 0 or 2) + 4,
             ["end"] = string.len(str) + string.len(detail) + 6,
         }
         str = str .. " " .. detail
     end
-    return (role_icon .. str), detailpos
+    return (icon .. str), detailpos
 end
 
 local function walk_tree(node, visited, result, padding, hl_bufs)
@@ -74,8 +69,8 @@ local function walk_tree(node, visited, result, padding, hl_bufs)
 
     if node.range then
         M.node_pos[hl_bufs.source_buf][hl_bufs.ast_buf][#result] = {
-            start = { node["range"]["start"]["line"], node["range"]["start"]["character"] },
-            ["end"] = { node["range"]["end"]["line"], node["range"]["end"]["character"] },
+            start = { node.range.start.line, node.range.start.character },
+            ["end"] = { node.range["end"].line, node.range["end"].character },
         }
     end
 
@@ -95,10 +90,10 @@ local function highlight_detail(ast_buf)
         vim.highlight.range(
             ast_buf,
             M.nsid,
-            "Comment",
+            conf.highlights.detail,
             { linenum - 1, range.start },
             { linenum - 1, range["end"] },
-            "<CTRL-V>",
+            "v",
             false,
             110
         )
@@ -133,11 +128,11 @@ local function handler(err, ASTNode)
 end
 
 function M.init()
-    -- node_pos[source_buf][ast_buf][linenum] = { start = start, end = end }
-    -- position of node in `source_buf` corresponding to line no. `linenum` in `ast_buf`
+    --- node_pos[source_buf][ast_buf][linenum] = { start = start, end = end }
+    --- position of node in `source_buf` corresponding to line no. `linenum` in `ast_buf`
     M.node_pos = {}
-    -- detail_pos[ast_buf][linenum] = { start = start, end = end }
-    -- position of `detail` in line no. `linenum` of `ast_buf`
+    --- detail_pos[ast_buf][linenum] = { start = start, end = end }
+    --- position of `detail` in line no. `linenum` of `ast_buf`
     M.detail_pos = {}
     M.nsid = vim.api.nvim_create_namespace("clangd_extensions")
 end
