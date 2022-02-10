@@ -37,6 +37,8 @@ end
 
 local function describe(role, kind, detail)
     local str = ""
+    local role_icon = icon_prefix(role)
+    local detailpos = nil
     str = str .. kind
     if
         not (
@@ -49,17 +51,29 @@ local function describe(role, kind, detail)
         str = str .. " " .. role
     end
     if detail then
+        detailpos = {
+            start = string.len(str) + (role_icon == "   " and 0 or 2) + 4,
+            ["end"] = string.len(str) + string.len(detail) + 6,
+        }
         str = str .. " " .. detail
     end
-    return icon_prefix(role) .. str
+    return (role_icon .. str), detailpos
 end
 
 local function walk_tree(node, visited, result, padding, hl_bufs)
     visited[node] = true
-    table.insert(result, padding .. describe(node.role, node.kind, node.detail))
+    local str, detpos = describe(node.role, node.kind, node.detail)
+    table.insert(result, padding .. str)
+
+    if node.detail and detpos then
+        M.detail_pos[hl_bufs.ast_buf][#result] = {
+            start = string.len(padding) + detpos.start,
+            ["end"] = string.len(padding) + detpos["end"],
+        }
+    end
 
     if node.range then
-        M.map[hl_bufs.source_buf][hl_bufs.ast_buf][#result] = {
+        M.node_pos[hl_bufs.source_buf][hl_bufs.ast_buf][#result] = {
             start = { node["range"]["start"]["line"], node["range"]["start"]["character"] },
             ["end"] = { node["range"]["end"]["line"], node["range"]["end"]["character"] },
         }
@@ -76,6 +90,21 @@ local function walk_tree(node, visited, result, padding, hl_bufs)
     return result
 end
 
+local function highlight_detail(ast_buf)
+    for linenum, range in pairs(M.detail_pos[ast_buf]) do
+        vim.highlight.range(
+            ast_buf,
+            M.nsid,
+            "Comment",
+            { linenum - 1, range.start },
+            { linenum - 1, range["end"] },
+            "<CTRL-V>",
+            false,
+            110
+        )
+    end
+end
+
 local function handler(err, ASTNode)
     if err or not ASTNode then
         return
@@ -83,10 +112,11 @@ local function handler(err, ASTNode)
         local source_buf = api.nvim_get_current_buf()
         vim.cmd(fmt([[vsplit %s:\ AST]], ASTNode.detail))
         local ast_buf = api.nvim_get_current_buf()
-        if not M.map[source_buf] then
-            M.map[source_buf] = {}
+        if not M.node_pos[source_buf] then
+            M.node_pos[source_buf] = {}
         end
-        M.map[source_buf][ast_buf] = {}
+        M.node_pos[source_buf][ast_buf] = {}
+        M.detail_pos[ast_buf] = {}
 
         local lines = walk_tree(ASTNode, {}, {}, "", { source_buf = source_buf, ast_buf = ast_buf })
         api.nvim_buf_set_lines(ast_buf, 0, -1, true, lines)
@@ -98,11 +128,17 @@ local function handler(err, ASTNode)
         api.nvim_win_set_option(0, "spell", false)
         api.nvim_win_set_option(0, "cursorline", false)
         setup_hl_autocmd(source_buf, ast_buf)
+        highlight_detail(ast_buf)
     end
 end
 
 function M.init()
-    M.map = {}
+    -- node_pos[source_buf][ast_buf][linenum] = { start = start, end = end }
+    -- position of node in `source_buf` corresponding to line no. `linenum` in `ast_buf`
+    M.node_pos = {}
+    -- detail_pos[ast_buf][linenum] = { start = start, end = end }
+    -- position of `detail` in line no. `linenum` of `ast_buf`
+    M.detail_pos = {}
     M.nsid = vim.api.nvim_create_namespace("clangd_extensions")
 end
 
@@ -116,7 +152,7 @@ function M.update_highlight(source_buf, ast_buf)
         return
     end
     local curline = vim.fn.getcurpos()[2]
-    local curline_ranges = M.map[source_buf][ast_buf][curline]
+    local curline_ranges = M.node_pos[source_buf][ast_buf][curline]
     if curline_ranges then
         vim.highlight.range(
             source_buf,
