@@ -8,7 +8,7 @@ local function setup_hl_autocmd(source_buf, ast_buf)
         [[
     augroup ClangdExtensions
     autocmd CursorMoved <buffer=%s> lua require("clangd_extensions.ast").update_highlight(%s,%s)
-    autocmd BufLeave <buffer=%s>   lua require("clangd_extensions.ast").clear_highlight(%s)
+    autocmd BufLeave <buffer=%s> lua require("clangd_extensions.ast").clear_highlight(%s)
     augroup END
     ]],
         ast_buf,
@@ -91,19 +91,12 @@ local function handler(err, ASTNode)
         local lines = walk_tree(ASTNode, {}, {}, "", { source_buf = source_buf, ast_buf = ast_buf })
         api.nvim_buf_set_lines(ast_buf, 0, -1, true, lines)
         vim.bo.buftype = "nofile"
+        vim.bo.bufhidden = "wipe"
         vim.bo.modifiable = false
         api.nvim_win_set_option(0, "number", false)
         api.nvim_win_set_option(0, "relativenumber", false)
         api.nvim_win_set_option(0, "spell", false)
         api.nvim_win_set_option(0, "cursorline", false)
-        vim.cmd(string.format(
-            [[
-        augroup ClangdWin
-        autocmd QuitPre <buffer=%s> bwipeout
-        augroup END
-        ]],
-            ast_buf
-        ))
         setup_hl_autocmd(source_buf, ast_buf)
     end
 end

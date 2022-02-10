@@ -38,18 +38,11 @@ local function handler(err, TypeHierarchyItem)
         api.nvim_buf_set_lines(bufnr, 0, -1, true, lines)
         vim.bo.buftype = "nofile"
         vim.bo.modifiable = false
+        vim.bo.bufhidden = "wipe"
         api.nvim_win_set_option(0, "number", false)
         api.nvim_win_set_option(0, "relativenumber", false)
         api.nvim_win_set_option(0, "spell", false)
         api.nvim_win_set_option(0, "cursorline", false)
-        vim.cmd(string.format(
-            [[
-        augroup ClangdWin
-        autocmd QuitPre <buffer=%s> bwipeout
-        augroup END
-        ]],
-            bufnr
-        ))
     end
 end
 

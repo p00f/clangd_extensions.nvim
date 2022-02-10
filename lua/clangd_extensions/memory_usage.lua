@@ -34,14 +34,6 @@ local function display(lines)
         noremap = true,
         silent = true,
     })
-    vim.cmd(string.format(
-        [[
-        augroup ClangdWin
-        autocmd QuitPre <buffer=%s> bwipeout
-        augroup END
-        ]],
-        buf
-    ))
 end
 
 local function format_name(name)
