@@ -7,7 +7,7 @@ local function format_tree(node, visited, result, padding)
     visited[node.data] = true
     table.insert(result, padding .. fmt(" • %s: %s", node.name, symbol_kind[node.kind]))
 
-    if node.parents then
+    if node.parents and #node.parents > 0 then
         table.insert(result, padding .. "   Parents:")
         for _, parent in pairs(node.parents) do
             if not visited[parent.data] then
