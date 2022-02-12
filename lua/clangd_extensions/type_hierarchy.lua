@@ -7,20 +7,24 @@ local function format_tree(node, visited, result, padding)
     visited[node.data] = true
     table.insert(result, padding .. fmt(" • %s: %s", node.name, symbol_kind[node.kind]))
 
-    if #node.parents > 0 then
-        table.insert(result, padding .. "   Parents:")
-        for _, parent in pairs(node.parents) do
-            if not visited[parent.data] then
-                format_tree(parent, visited, result, padding .. "   ")
+    if node.parents then
+        if #node.parents > 0 then
+            table.insert(result, padding .. "   Parents:")
+            for _, parent in pairs(node.parents) do
+                if not visited[parent.data] then
+                    format_tree(parent, visited, result, padding .. "   ")
+                end
             end
         end
     end
 
-    if #node.children > 0 then
-        table.insert(result, padding .. "   Children:")
-        for _, child in pairs(node.children) do
-            if not visited[child.data] then
-                format_tree(child, visited, result, padding .. "   ")
+    if node.children then
+        if #node.children > 0 then
+            table.insert(result, padding .. "   Children:")
+            for _, child in pairs(node.children) do
+                if not visited[child.data] then
+                    format_tree(child, visited, result, padding .. "   ")
+                end
             end
         end
     end
