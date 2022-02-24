@@ -76,12 +76,29 @@ require("clangd_extensions").setup {
 ![image](https://user-images.githubusercontent.com/36493671/152699601-61ad1640-96bf-4082-b553-75d4085c3496.png)
 #### Usage
 See configuration instructions above
-### [Memory usage](https://clangd.llvm.org/extensions#memory-usage)
-![image](https://user-images.githubusercontent.com/36493671/152699322-9e537b1a-8253-45c1-ada3-752effeac39b.png)
-#### Usage
-`:ClangdMemoryUsage`. Preamble can be large so it is collapsed by default, to expand it use `:ClangdMemoryUsage expand_preamble`
 ### [View AST](https://clangd.llvm.org/extensions#ast)
 https://user-images.githubusercontent.com/36493671/152699182-af1db73b-4996-4403-9190-f420f129641a.mp4
+### [Completion scores](https://clangd.llvm.org/extensions#code-completion-scores)
+Usage: For nvim-cmp
+```lua
+local cmp = require "cmp"
+cmp.setup {
+    -- ... rest of your cmp setup ...
+
+    sorting = {
+        comparators = {
+            cmp.config.compare.offset,
+            cmp.config.compare.exact,
+            cmp.config.compare.recently_used,
+            require("clangd_extensions.cmp_scores"),
+            cmp.config.compare.kind,
+            cmp.config.compare.sort_text,
+            cmp.config.compare.length,
+            cmp.config.compare.order,
+        },
+    },
+}
+```
 #### Usage
 `:ClangdAST` to view the ast with the current line as the range, `:'<,'>ClangdAST` with a visual selection to view the ast with the selected lines as range.
 See how ranges are handled at https://clangd.llvm.org/extensions#ast
@@ -93,6 +110,10 @@ See how ranges are handled at https://clangd.llvm.org/extensions#ast
 ![image](https://user-images.githubusercontent.com/36493671/152699475-cc920980-0af9-4eb3-852c-23f487eba2ae.png)
 #### Usage
 `:ClangdTypeHierarchy` with the cursor over the desired type or a symbol of that type.
+### [Memory usage](https://clangd.llvm.org/extensions#memory-usage)
+![image](https://user-images.githubusercontent.com/36493671/152699322-9e537b1a-8253-45c1-ada3-752effeac39b.png)
+#### Usage
+`:ClangdMemoryUsage`. Preamble can be large so it is collapsed by default, to expand it use `:ClangdMemoryUsage expand_preamble`
 
 ## Implementation status of [extensions](https://clangd.llvm.org/extensions)
  - [x] Memory usage (implemented)
@@ -103,7 +124,7 @@ See how ranges are handled at https://clangd.llvm.org/extensions#ast
  - [x] Switch between source/header (nvim-lspconfig already does this)
  - [x] File status (see lsp-status.nvim)
  - [x] Compilation commands (can be specified in lspconfig `init_options`)
- - [ ] Code completion scores (can be done using cmp comparators)
+ - [x] Code completion scores (implemented)
  - [ ] Force diagnostics generation (not sure)
 ## Credits
 [simrat39](https://github.com/simrat39) - the code for inlay hints was taken from [rust-tools.nvim](https://github.com/simrat39/rust-tools.nvim) with very minor changes.
