@@ -118,6 +118,8 @@ local function handler(err, ASTNode)
         vim.bo.buftype = "nofile"
         vim.bo.bufhidden = "wipe"
         vim.bo.modifiable = false
+        vim.bo.shiftwidth = 2
+        vim.wo.foldmethod = "indent"
         api.nvim_win_set_option(0, "number", false)
         api.nvim_win_set_option(0, "relativenumber", false)
         api.nvim_win_set_option(0, "spell", false)
