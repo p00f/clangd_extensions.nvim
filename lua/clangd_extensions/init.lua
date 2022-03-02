@@ -26,16 +26,16 @@ function M.setup(opts)
     -- Set up extensions, get lspconfig opts
     config.setup(opts)
     -- Set up autocommands for inlay hints
-    if config.options.extensions.autoSetHints then
-        local old_func = config.options.server.on_attach
-        config.options.server.on_attach = function(client, bufnr)
-            if old_func then
-                old_func(client, bufnr)
-            end
+    local old_func = config.options.server.on_attach
+    config.options.server.on_attach = function(client, bufnr)
+        if old_func then
+            old_func(client, bufnr)
+        end
+        if config.options.extensions.autoSetHints then
             require("clangd_extensions.inlay_hints").setup_autocmd()
             require("clangd_extensions.inlay_hints").set_inlay_hints()
-            vim.cmd(commands)
         end
+        vim.cmd(commands)
     end
     -- Call lspconfig setup
     require("lspconfig").clangd.setup(config.options.server)
