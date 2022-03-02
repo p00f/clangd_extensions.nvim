@@ -68,7 +68,13 @@ require("clangd_extensions").setup {
             highlights = {
                 detail = "Comment",
             },
-    }
+        memory_usage = {
+            border = "none",
+        },
+        symbol_info = {
+            border = "none",
+        },
+    },
 }
 ```
 ## Features:
@@ -112,6 +118,7 @@ See how ranges are handled at https://clangd.llvm.org/extensions#ast
 #### Usage
 `:ClangdTypeHierarchy` with the cursor over the desired type or a symbol of that type.
 ### [Memory usage](https://clangd.llvm.org/extensions#memory-usage)
+You can fold items using `zc` and friends - the memory usage window has `shiftwidth=2` and `foldmethod=indent`.
 ![image](https://user-images.githubusercontent.com/36493671/152699322-9e537b1a-8253-45c1-ada3-752effeac39b.png)
 #### Usage
 `:ClangdMemoryUsage`. Preamble can be large so it is collapsed by default, to expand it use `:ClangdMemoryUsage expand_preamble`

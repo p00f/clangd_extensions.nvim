@@ -1,5 +1,6 @@
 local api = vim.api
 local fmt = string.format
+local config = require("clangd_extensions.config")
 
 local function display(lines)
     for k, line in pairs(lines) do -- Pad lines
@@ -21,7 +22,10 @@ local function display(lines)
         height = height,
         row = row,
         col = col,
+        border = config.options.extensions.memory_usage.border,
     })
+    vim.bo.shiftwidth = 2
+    vim.wo.foldmethod = "indent"
     api.nvim_buf_set_lines(buf, 0, -1, true, lines)
     api.nvim_buf_set_option(buf, "bufhidden", "wipe")
     api.nvim_buf_set_option(buf, "modifiable", false)

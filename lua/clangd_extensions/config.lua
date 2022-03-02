@@ -39,7 +39,15 @@ local defaults = {
 
             highlights = {
                 detail = "Comment",
-            }
+            },
+        },
+
+        memory_usage = {
+            border = "none",
+        },
+
+        symbol_info = {
+            border = "none",
         },
     },
 
