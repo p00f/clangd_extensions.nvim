@@ -122,15 +122,15 @@ You can fold items using `zc` and friends - the memory usage window has `shiftwi
 `:ClangdMemoryUsage`. Preamble can be large so it is collapsed by default, to expand it use `:ClangdMemoryUsage expand_preamble`
 
 ## Implementation status of [extensions](https://clangd.llvm.org/extensions)
- - [✔] Memory usage (implemented)
- - [✔] AST (implemented)
- - [✔] Symbol info request (implemented)
- - [✔] Type hierarchy (implemented)
- - [✔] Inlay hints (implemented)
- - [✔] Switch between source/header (nvim-lspconfig already does this)
- - [✔] File status (see lsp-status.nvim)
- - [✔] Compilation commands (can be specified in lspconfig `init_options`)
- - [✔] Code completion scores (implemented)
- - [ ] Force diagnostics generation (not sure)
+ ☑️ Memory usage (implemented)
+ ☑️ AST (implemented)
+ ☑️ Symbol info request (implemented)
+ ☑️ Type hierarchy (implemented)
+ ☑️ Inlay hints (implemented)
+ ☑️ Switch between source/header (nvim-lspconfig already does this)
+ ☑️ File status (see lsp-status.nvim)
+ ☑️ Compilation commands (can be specified in lspconfig `init_options`)
+ ☑️ Code completion scores (implemented)
+ ⬜ Force diagnostics generation (not sure)
 ## Credits
 [simrat39](https://github.com/simrat39) - the code for inlay hints was taken from [rust-tools.nvim](https://github.com/simrat39/rust-tools.nvim) with very minor changes.
