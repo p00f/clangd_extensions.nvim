@@ -212,6 +212,7 @@ local function handler(err, result, ctx)
                     { virt_text, config.options.extensions.inlay_hints.highlight },
                 },
                 hl_mode = "combine",
+                priority = config.options.extensions.inlay_hints.priority,
             })
 
             -- update state
