@@ -15,6 +15,7 @@ local defaults = {
             right_align = false,
             right_align_padding = 7,
             highlight = "Comment",
+            priority = 100,
         },
 
         ast = {

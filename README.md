@@ -42,6 +42,8 @@ require("clangd_extensions").setup {
             right_align_padding = 7,
             -- The color of the hints
             highlight = "Comment",
+            -- The highlight group priority for extmark
+            priority = 100,
         },
         ast = {
             role_icons = {
