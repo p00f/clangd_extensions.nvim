@@ -237,7 +237,15 @@ end
 
 -- Sends the request to clangd to get the inlay hints and handle them
 function M.set_inlay_hints()
-    vim.lsp.buf_request(0, "clangd/inlayHints", get_params(), handler)
+    local buf = vim.api.nvim_get_current_buf()
+    local clients = vim.lsp.buf_get_clients(buf)
+    -- ensure clangd is running and request doesn't cause error
+    for _, c in pairs(clients) do
+        if c.name == "clangd" then
+            vim.lsp.buf_request(0, "clangd/inlayHints", get_params(), handler)
+            break
+        end
+    end
 end
 
 return M
