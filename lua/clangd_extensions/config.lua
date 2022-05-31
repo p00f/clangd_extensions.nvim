@@ -2,7 +2,6 @@ local M = {}
 local defaults = {
     extensions = {
         autoSetHints = true,
-        hover_with_actions = true,
 
         inlay_hints = {
             only_current_line = false,
