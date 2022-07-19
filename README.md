@@ -65,6 +65,7 @@ require("clangd_extensions").setup {
             highlights = {
                 detail = "Comment",
             },
+        },
         memory_usage = {
             border = "none",
         },
