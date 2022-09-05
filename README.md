@@ -82,6 +82,7 @@ require("clangd_extensions").setup {
 See configuration instructions above
 ### [View AST](https://clangd.llvm.org/extensions#ast)
 You can fold nodes using `zc` and friends - the AST window has `shiftwidth=2` and `foldmethod=indent`.
+
 https://user-images.githubusercontent.com/36493671/152699182-af1db73b-4996-4403-9190-f420f129641a.mp4
 #### Usage
 `:ClangdAST` to view the ast with the current line as the range, `:'<,'>ClangdAST` with a visual selection to view the ast with the selected lines as range.
