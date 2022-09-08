@@ -1,5 +1,8 @@
 ![clangd](https://user-images.githubusercontent.com/36493671/152692205-837ec826-54d0-4257-9894-cc1a7ac8a114.svg)
 
+## Installation
+Install this plugin using any plugin/package manager or see [`:h packages`](https://neovim.io/doc/user/repeat.html#packages)
+
 ## Configuration:
 This is the default config, you can call `require("clangd_extensions").setup()` with no arguments if you don't want to make changes.
 Remove `require'lspconfig'.clangd.setup{}` from your config, this will be called by clangd_extensions.nvim. Use the `server` field below to customize `setup{}`.
