@@ -46,17 +46,10 @@ local function describe(role, kind, detail)
         str = str .. " " .. role
     end
     if detail then
-        if icon == "   " then
-            detailpos = {
-                start = string.len(str) + 4,
-                ["end"] = string.len(str) + string.len(detail) + 6,
-            }
-        else
-            detailpos = {
-                start = string.len(str) + vim.fn.strlen(icon),
-                ["end"] = string.len(str) + vim.fn.strlen(icon) + string.len(detail) + 1,
-            }
-        end
+        detailpos = {
+            start = string.len(str) + vim.fn.strlen(icon) + 1,
+            ["end"] = string.len(str) + vim.fn.strlen(icon) + string.len(detail) + 1,
+        }
         str = str .. " " .. detail
     end
     return (icon .. str), detailpos
