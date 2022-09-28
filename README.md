@@ -108,6 +108,7 @@ You can fold nodes using `zc` and friends - the AST window has `shiftwidth=2` an
 https://user-images.githubusercontent.com/36493671/152699182-af1db73b-4996-4403-9190-f420f129641a.mp4
 #### Usage
 `:ClangdAST` to view the ast with the current line as the range, `:'<,'>ClangdAST` with a visual selection to view the ast with the selected lines as range.
+See how ranges are handled at https://clangd.llvm.org/extensions#ast
 ### [Completion scores](https://clangd.llvm.org/extensions#code-completion-scores)
 Usage: For nvim-cmp
 ```lua
@@ -129,7 +130,6 @@ cmp.setup {
     },
 }
 ```
-See how ranges are handled at https://clangd.llvm.org/extensions#ast
 ### [Symbol info](https://clangd.llvm.org/extensions#symbol-info-request)
 ![image](https://user-images.githubusercontent.com/36493671/152699367-dc928adf-d3ed-4e8e-a9d0-ca573f01c008.png)
 #### Usage
