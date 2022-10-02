@@ -103,7 +103,7 @@ require("clangd_extensions").setup {
 #### Usage
 See configuration instructions above
 ### [View AST](https://clangd.llvm.org/extensions#ast)
-You can fold nodes using <kbd>**zc**</kbd> and friends - the AST window has `shiftwidth=2` and `foldmethod=indent`.
+You can fold nodes using `zc` and friends - the AST window has `shiftwidth=2` and `foldmethod=indent`.
 
 https://user-images.githubusercontent.com/36493671/152699182-af1db73b-4996-4403-9190-f420f129641a.mp4
 #### Usage
@@ -139,7 +139,7 @@ cmp.setup {
 #### Usage
 `:ClangdTypeHierarchy` with the cursor over the desired type or a symbol of that type.
 ### [Memory usage](https://clangd.llvm.org/extensions#memory-usage)
-You can fold items using <kbd>**zc**</kbd> and friends - the memory usage window has `shiftwidth=2` and `foldmethod=indent`.
+You can fold items using `zc` and friends - the memory usage window has `shiftwidth=2` and `foldmethod=indent`.
 ![image](https://user-images.githubusercontent.com/36493671/152699322-9e537b1a-8253-45c1-ada3-752effeac39b.png)
 #### Usage
 `:ClangdMemoryUsage`. Preamble can be large so it is collapsed by default, to expand it use `:ClangdMemoryUsage expand_preamble`
