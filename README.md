@@ -4,8 +4,15 @@
 Install this plugin using any plugin/package manager or see [`:h packages`](https://neovim.io/doc/user/repeat.html#packages)
 
 ## Configuration:
-This is the default config, you can call `require("clangd_extensions").setup()` with no arguments if you don't want to make changes.
-Remove `require'lspconfig'.clangd.setup{}` from your config, this will be called by clangd_extensions.nvim. Use the `server` field below to customize `setup{}`.
+
+Calling `setup` will instruct `clangd_extensions` to configure lsp via lspconfig automatically. So if you use it, remove `require'lspconfig'.clangd.setup{}` from your config. Use the `server` config field to customize lspconfig settings.
+
+If you prefer to integrate `clangd_extensions` into your own LSP setup, `require("clangd_extensions").prepare()` applies passed configuration to `clangd_extensions` and returns lspconfig configuration table for further processing. Any customisations passed to `server` config field will be present in this returned configuration.
+
+### Default configuration
+
+You can call `require("clangd_extensions").setup()` or `require("clangd_extensions").prepare()` with no arguments if you don't want to make changes.
+
 ```lua
 require("clangd_extensions").setup {
     server = {
