@@ -107,6 +107,7 @@ local function handler(err, ASTNode)
         local source_buf = api.nvim_get_current_buf()
         vim.cmd(fmt([[vsplit %s:\ AST]], ASTNode.detail))
         local ast_buf = api.nvim_get_current_buf()
+        api.nvim_buf_set_option(ast_buf, "filetype", "ClangdAST")
         if not M.node_pos[source_buf] then
             M.node_pos[source_buf] = {}
         end

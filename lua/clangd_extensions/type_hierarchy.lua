@@ -41,6 +41,7 @@ local function handler(err, TypeHierarchyItem)
         local bufnr = vim.api.nvim_get_current_buf()
         api.nvim_buf_set_lines(bufnr, 0, -1, true, lines)
         vim.bo.buftype = "nofile"
+        vim.bo.filetype = "ClangdTypeHierarchy"
         vim.bo.modifiable = false
         vim.bo.bufhidden = "wipe"
         api.nvim_win_set_option(0, "number", false)
