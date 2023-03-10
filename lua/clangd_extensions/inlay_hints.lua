@@ -37,6 +37,7 @@ function M.setup_autocmd()
     end
 
     vim.api.nvim_command("augroup ClangdInlayHints")
+    vim.api.nvim_command("au! * <buffer>")
     vim.api.nvim_command(
         "autocmd "
             .. events
