@@ -4,6 +4,7 @@ local defaults = {
         autoSetHints = true,
 
         inlay_hints = {
+            inline = vim.fn.has("nvim-0.10") == 1,
             only_current_line = false,
             only_current_line_autocmd = "CursorHold",
             show_parameter_hints = true,
@@ -19,12 +20,12 @@ local defaults = {
 
         ast = {
             role_icons = {
-                 type = "🄣",
-                 declaration = "🄓",
-                 expression = "🄔",
-                 statement = ";",
-                 specifier = "🄢",
-                 ["template argument"] = "🆃",
+                type = "🄣",
+                declaration = "🄓",
+                expression = "🄔",
+                statement = ";",
+                specifier = "🄢",
+                ["template argument"] = "🆃",
             },
 
             kind_icons = {

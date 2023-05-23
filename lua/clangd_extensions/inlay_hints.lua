@@ -40,14 +40,30 @@ function M.setup_autocmd()
     vim.api.nvim_command("au! * <buffer>")
     vim.api.nvim_command(
         "autocmd "
-            .. events
-            .. ' <buffer> lua require"clangd_extensions.inlay_hints".set_inlay_hints()'
+        .. events
+        .. ' <buffer> lua require"clangd_extensions.inlay_hints".set_inlay_hints()'
     )
     vim.api.nvim_command("augroup END")
 end
 
 local function get_params()
     return { textDocument = vim.lsp.util.make_text_document_params() }
+end
+
+local function get_inline_params()
+    return {
+        textDocument = vim.lsp.util.make_text_document_params(),
+        range = {
+            start = {
+                line = 0,
+                character = 0,
+            },
+            ["end"] = {
+                line = vim.api.nvim_buf_line_count(0),
+                character = 0,
+            }
+        }
+    }
 end
 
 local namespace = vim.api.nvim_create_namespace("clangd/inlayHints")
@@ -200,8 +216,8 @@ local function handler(err, result, ctx)
                 virt_text = string.rep(
                     " ",
                     max_len
-                        - current_line_len
-                        + config.options.extensions.inlay_hints.max_len_align_padding
+                    - current_line_len
+                    + config.options.extensions.inlay_hints.max_len_align_padding
                 ) .. virt_text
             end
 
@@ -219,6 +235,40 @@ local function handler(err, result, ctx)
             -- update state
             enabled = true
         end
+    end
+end
+
+local function inline_handler(err, result, ctx)
+    if err then
+        return
+    end
+    local bufnr = ctx.bufnr
+
+    if vim.api.nvim_get_current_buf() ~= bufnr then
+        return
+    end
+
+    -- clean it up first
+    M.disable_inlay_hints()
+
+    for _, hint in pairs(result) do
+        local text = hint.label
+        if hint.paddingLeft then
+            text = " " .. text
+        end
+        if hint.paddingRight then
+            text = text .. " "
+        end
+        local line = hint.position.line
+        local col = hint.position.character
+        vim.api.nvim_buf_set_extmark(bufnr, namespace, line, col, {
+            virt_text_pos = "inline",
+            virt_text = {
+                { text, config.options.extensions.inlay_hints.highlight },
+            },
+            hl_mode = "combine",
+            priority = config.options.extensions.inlay_hints.priority,
+        })
     end
 end
 
@@ -243,7 +293,11 @@ function M.set_inlay_hints()
     -- ensure clangd is running and request doesn't cause error
     for _, c in pairs(clients) do
         if c.name == "clangd" then
-            vim.lsp.buf_request(0, "clangd/inlayHints", get_params(), handler)
+            if config.options.extensions.inlay_hints.inline then
+                vim.lsp.buf_request(0, "textDocument/inlayHint", get_inline_params(), inline_handler)
+            else
+                vim.lsp.buf_request(0, "clangd/inlayHints", get_params(), handler)
+            end
             break
         end
     end
