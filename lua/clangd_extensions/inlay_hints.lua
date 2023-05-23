@@ -117,6 +117,63 @@ local function parseHints(result)
     return map
 end
 
+local function get_virt_text_pos()
+    local opts = config.options.extensions.inlay_hints
+    if opts.right_align then
+        return 'right_align'
+    else
+        return 'eol'
+    end
+end
+
+local function format_label(hint)
+    local opts = config.options.extensions.inlay_hints
+    local text = hint.label
+    if hint.kind == 'parameter' then
+        if opts.parameter_hints_formatter ~= nil then
+          text = opts.parameter_hints_formatter(text, opts.parameter_hints_prefix)
+        else
+          text = opts.parameter_hints_prefix .. text
+        end
+    else
+        if opts.other_hints_formatter ~= nil then
+          text = opts.other_hints_formatter(text, opts.other_hints_prefix)
+        else
+          text = opts.other_hints_formatter(text, opts.other_hints_prefix)
+        end
+    end
+    return text
+end
+
+local function filter_inlines(hints)
+    local opts = config.options.extensions.inlay_hints
+    local only_current_line = opts.only_current_line
+    local current_line = vim.api.nvim_win_get_cursor(0)[1]
+    local result = {}
+    local not_inline_hints = {}
+
+    local function is_inline(hint)
+        return (hint.kind == 'parameter' and opts.parameter_hints_inline) or
+            (hint.kind ~= 'parameter' and opts.other_hints_inline)
+    end
+
+    -- in `inline` mode, the hints position has been provided by clangd
+    for _, hint in ipairs(hints) do
+        if is_inline(hint) then
+            if only_current_line then
+                if tonumber(hint.position.line) == current_line - 1 then
+                    result[#result+1] = hint
+                end
+            else
+                result[#result+1] = hint
+            end
+        else
+            not_inline_hints[#not_inline_hints+1] = hint
+        end
+    end
+    return result, not_inline_hints
+end
+
 local function handler(err, result, ctx)
     if err then
         return
@@ -131,7 +188,26 @@ local function handler(err, result, ctx)
     -- clean it up at first
     M.disable_inlay_hints()
 
-    local ret = parseHints(result)
+    local inlines, not_inlines = filter_inlines(result)
+
+    -- inline pos can be rendered immediately
+    for _, hint in ipairs(inlines) do
+        local line = hint.position.line
+        local col = hint.position.character
+        local text = format_label(hint)
+        vim.api.nvim_buf_set_extmark(bufnr, namespace, line, col, {
+            virt_text_pos = 'inline',
+            virt_text = { { text, config.options.extensions.inlay_hints.highlight } },
+            hl_mode = 'combine',
+            priority = config.options.extensions.inlay_hints.priority,
+        })
+        -- update state
+        enabled = true
+    end
+
+    -- merge not_inline_hints with the same line number
+    local virt_text_pos = get_virt_text_pos()
+    local ret = parseHints(not_inlines)
     local max_len = -1
 
     for key, _ in pairs(ret) do
@@ -158,13 +234,9 @@ local function handler(err, result, ctx)
             -- segregate paramter hints and other hints
             for _, value_inner in ipairs(value) do
                 if value_inner.kind == "parameter" then
-                    table.insert(param_hints, value_inner.label:sub(1, -3))
+                    table.insert(param_hints, format_label(value_inner))
                 else
-                    local hint_text = value_inner.label
-                    if hint_text:sub(1, 2) == ": " then
-                        hint_text = hint_text:sub(3)
-                    end
-                    table.insert(other_hints, hint_text)
+                    table.insert(other_hints, format_label(value_inner))
                 end
             end
 
@@ -207,8 +279,7 @@ local function handler(err, result, ctx)
 
             -- set the virtual text
             vim.api.nvim_buf_set_extmark(bufnr, namespace, line, 0, {
-                virt_text_pos = config.options.extensions.inlay_hints.right_align and "right_align"
-                    or "eol",
+                virt_text_pos = virt_text_pos,
                 virt_text = {
                     { virt_text, config.options.extensions.inlay_hints.highlight },
                 },

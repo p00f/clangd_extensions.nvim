@@ -37,8 +37,23 @@ require("clangd_extensions").setup {
             show_parameter_hints = true,
             -- prefix for parameter hints
             parameter_hints_prefix = "<- ",
+            -- function to format parameter hints' labels
+            parameter_hints_formatter = function(label)
+                return label:sub(1, -3)
+            end,
+            -- whether to render the other hints inline or not
+            parameter_hints_inline = false,
             -- prefix for all the other hints (type, chaining)
             other_hints_prefix = "=> ",
+            -- function to format other hints' labels
+            other_hints_formatter = function(label)
+                if label:sub(1, 2) == ": " then
+                    return label:sub(3)
+                end
+                return label
+            end,
+            -- whether to render the other hints inline or not
+            other_hints_inline = false,
             -- whether to align to the length of the longest line in the file
             max_len_align = false,
             -- padding from the left if max_len_align is true
