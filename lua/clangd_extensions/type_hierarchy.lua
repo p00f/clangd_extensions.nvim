@@ -1,5 +1,3 @@
--- vim: set ft=lua ts=4 sw=0 tw=0:
-
 local symbol_kind = require("clangd_extensions.symbol_kind")
 local fmt = string.format
 local api = vim.api
