@@ -40,6 +40,7 @@ local function handler(err, TypeHierarchyItem, ctx)
     if err or not TypeHierarchyItem then
         return
     else
+        local oldwin = api.nvim_get_current_win()
         vim.cmd(fmt([[split %s:\ type\ hierarchy]], TypeHierarchyItem.name))
         local bufnr = vim.api.nvim_get_current_buf()
         -- retrieve offset_encoding for later use
@@ -52,12 +53,6 @@ local function handler(err, TypeHierarchyItem, ctx)
         vim.bo.buftype = "nofile"
         vim.bo.bufhidden = "wipe"
         vim.bo.buflisted = true
-        local old_winopts = {
-            number = api.nvim_get_option_value("number", {}),
-            relativenumber = api.nvim_get_option_value("relativenumber", {}),
-            spell = api.nvim_get_option_value("spell", {}),
-            cursorline = api.nvim_get_option_value("cursorline", {})
-        }
         api.nvim_win_set_option(0, "number", false)
         api.nvim_win_set_option(0, "relativenumber", false)
         api.nvim_win_set_option(0, "spell", false)
@@ -67,16 +62,14 @@ local function handler(err, TypeHierarchyItem, ctx)
         syntax clear
         syntax match ClangdTypeName "\( \{2,\}• \)\@<=\w\+\(:\)\@="
         ]])
-        vim.api.nvim_set_hl(0, "ClangdTypeName", {link = "Underlined"})
-        vim.keymap.set("n", "gd", function ()
+        vim.api.nvim_set_hl(0, "ClangdTypeName", { link = "Underlined" })
+        vim.keymap.set("n", "gd", function()
             local word = vim.fn.expand("<cWORD>")
             word = string.gsub(word, ":$", "")
             local location = type_pos_mappings[bufnr][word]
             if location ~= nil then
+                api.nvim_set_current_win(oldwin)
                 vim.lsp.util.jump_to_location(location, M.offset_encoding)
-            end
-            for option, value in pairs(old_winopts) do
-                api.nvim_win_set_option(0, option, value)
             end
         end, { buffer = bufnr, desc = "go to definition of cursor" })
     end
