@@ -45,7 +45,7 @@ function M.setup_comands()
         vim.api.nvim_create_user_command('ClangdSetInlayHints', inlay_hints.set_inlay_hints, { nargs = 0 })
         vim.api.nvim_create_user_command('ClangdDisableInlayHints', inlay_hints.disable_inlay_hints, { nargs = 0 })
         vim.api.nvim_create_user_command('ClangdToggleInlayHints', inlay_hints.toggle_inlay_hints, { nargs = 0 })
-        vim.api.nvim_create_user_command('ClangAST', function(opts) ast.display_ast(opts.line1, opts.line2) end, { range = true, nargs = 0 })
+        vim.api.nvim_create_user_command('ClangdAST', function(opts) ast.display_ast(opts.line1, opts.line2) end, { range = true, nargs = 0 })
         vim.api.nvim_create_user_command('ClangdTypeHierarchy', type_hierarchy.show_hierarchy, { nargs = 0 })
         vim.api.nvim_create_user_command('ClangdSymbolInfo', symbol_info.show_symbol_info, { nargs = 0 })
         vim.api.nvim_create_user_command(
