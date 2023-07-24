@@ -145,7 +145,8 @@ cmp.setup {
 #### Usage
 `:ClangdSymbolInfo` with the cursor at the desired symbol.
 ### [Type hierarchy](https://clangd.llvm.org/extensions#type-hierarchy)
-![video](https://user-images.githubusercontent.com/36493671/255579700-5598f8f1-04c1-43ec-b7fe-396ff5cab327.mp4)
+
+https://user-images.githubusercontent.com/36493671/255579700-5598f8f1-04c1-43ec-b7fe-396ff5cab327.mp4
 #### Usage
 `:ClangdTypeHierarchy` with the cursor over the desired type or a symbol of that type.
 `gd` with the cursor over a type in a window to go to its definition.
