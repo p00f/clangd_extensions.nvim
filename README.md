@@ -22,7 +22,7 @@ require("clangd_extensions").setup {
     extensions = {
         -- defaults:
         -- Automatically set inlay hints (type hints)
-        autoSetHints = true,
+        autoSetHints = vim.fn.has("nvim-0.10") ~= 1,
         -- These apply to the default ClangdSetInlayHints command
         inlay_hints = {
             inline = vim.fn.has("nvim-0.10") == 1,

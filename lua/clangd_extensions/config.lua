@@ -1,7 +1,7 @@
 local M = {}
 local defaults = {
     extensions = {
-        autoSetHints = true,
+        autoSetHints = vim.fn.has("nvim-0.10") ~= 1,
 
         inlay_hints = {
             inline = vim.fn.has("nvim-0.10") == 1,
