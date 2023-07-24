@@ -1,20 +1,24 @@
 local symbol_kind = require("clangd_extensions.symbol_kind")
 local fmt = string.format
 local api = vim.api
-local M = {}
+local type_hierarchy_augroup = api.nvim_create_augroup("ClangdTypeHierarchy", {})
 
-local function format_tree(node, visited, result, padding, type_pos_mapping)
+local M = {}
+M.type_to_location = {}
+M.offset_encoding = {}
+
+local function format_tree(node, visited, result, padding, type_to_location)
     visited[node.data] = true
     table.insert(result, padding .. fmt(" • %s: %s", node.name, symbol_kind[node.kind]))
 
-    type_pos_mapping[node.name] = { uri = node.uri, range = node.range }
+    type_to_location[node.name] = { uri = node.uri, range = node.range }
 
     if node.parents then
         if #node.parents > 0 then
             table.insert(result, padding .. "   Parents:")
             for _, parent in pairs(node.parents) do
                 if not visited[parent.data] then
-                    format_tree(parent, visited, result, padding .. "   ", type_pos_mapping)
+                    format_tree(parent, visited, result, padding .. "   ", type_to_location)
                 end
             end
         end
@@ -25,7 +29,7 @@ local function format_tree(node, visited, result, padding, type_pos_mapping)
             table.insert(result, padding .. "   Children:")
             for _, child in pairs(node.children) do
                 if not visited[child.data] then
-                    format_tree(child, visited, result, padding .. "   ", type_pos_mapping)
+                    format_tree(child, visited, result, padding .. "   ", type_to_location)
                 end
             end
         end
@@ -34,20 +38,25 @@ local function format_tree(node, visited, result, padding, type_pos_mapping)
     return result
 end
 
-_G.type_pos_mappings = {}
 
 local function handler(err, TypeHierarchyItem, ctx)
     if err or not TypeHierarchyItem then
         return
     else
-        local oldwin = api.nvim_get_current_win()
+        -- Save old state
+        local source_win = api.nvim_get_current_win()
+
+        -- Init
+        M.offset_encoding[ctx.client_id] = vim.lsp.get_client_by_id(ctx.client_id).offset_encoding
         vim.cmd(fmt([[split %s:\ type\ hierarchy]], TypeHierarchyItem.name))
         local bufnr = vim.api.nvim_get_current_buf()
-        -- retrieve offset_encoding for later use
-        M.offset_encoding = vim.lsp.get_client_by_id(ctx.client_id).offset_encoding
-        type_pos_mappings[bufnr] = {}
-        local lines = format_tree(TypeHierarchyItem, {}, {}, "", type_pos_mappings[bufnr])
+        M.type_to_location[bufnr] = {}
+
+        -- Set content
+        local lines = format_tree(TypeHierarchyItem, {}, {}, "", M.type_to_location[bufnr])
         api.nvim_buf_set_lines(bufnr, 0, -1, true, lines)
+
+        -- Set options
         vim.bo.modifiable = false
         vim.bo.filetype = "ClangdTypeHierarchy"
         vim.bo.buftype = "nofile"
@@ -58,20 +67,32 @@ local function handler(err, TypeHierarchyItem, ctx)
         api.nvim_win_set_option(0, "spell", false)
         api.nvim_win_set_option(0, "cursorline", false)
 
+        -- Set highlights
         vim.cmd([[
         syntax clear
         syntax match ClangdTypeName "\( \{2,\}• \)\@<=\w\+\(:\)\@="
         ]])
         vim.api.nvim_set_hl(0, "ClangdTypeName", { link = "Underlined" })
+
+        -- Set keymap
         vim.keymap.set("n", "gd", function()
             local word = vim.fn.expand("<cWORD>")
             word = string.gsub(word, ":$", "")
-            local location = type_pos_mappings[bufnr][word]
+            local location = M.type_to_location[bufnr][word]
             if location ~= nil then
-                api.nvim_set_current_win(oldwin)
-                vim.lsp.util.jump_to_location(location, M.offset_encoding)
+                api.nvim_set_current_win(source_win)
+                vim.lsp.util.jump_to_location(location, M.offset_encoding[ctx.client_id])
             end
-        end, { buffer = bufnr, desc = "go to definition of cursor" })
+        end, { buffer = bufnr, desc = "go to definition of type under cursor" })
+
+        -- Clear `type_to_location` for this buffer when it is wiped out
+        api.nvim_create_autocmd("BufWipeOut", {
+            buffer = bufnr,
+            group = type_hierarchy_augroup,
+            callback = function()
+                M.type_to_location[bufnr] = nil
+            end
+        })
     end
 end
 
