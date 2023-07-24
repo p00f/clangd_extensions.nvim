@@ -145,9 +145,10 @@ cmp.setup {
 #### Usage
 `:ClangdSymbolInfo` with the cursor at the desired symbol.
 ### [Type hierarchy](https://clangd.llvm.org/extensions#type-hierarchy)
-![image](https://user-images.githubusercontent.com/36493671/152699475-cc920980-0af9-4eb3-852c-23f487eba2ae.png)
+![gif](https://media.hachyderm.io/media_attachments/files/110/768/828/620/008/854/original/ef0829ca7906f442.mp4)
 #### Usage
 `:ClangdTypeHierarchy` with the cursor over the desired type or a symbol of that type.
+`gd` with the cursor over a type in a window to go to its definition.
 ### [Memory usage](https://clangd.llvm.org/extensions#memory-usage)
 You can fold items using `zc` and friends - the memory usage window has `shiftwidth=2` and `foldmethod=indent`.
 ![image](https://user-images.githubusercontent.com/36493671/152699322-9e537b1a-8253-45c1-ada3-752effeac39b.png)
