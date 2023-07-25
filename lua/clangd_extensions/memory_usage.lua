@@ -27,9 +27,9 @@ local function display(lines)
     vim.bo.shiftwidth = 2
     vim.wo.foldmethod = "indent"
     api.nvim_buf_set_lines(buf, 0, -1, true, lines)
-    api.nvim_buf_set_option(buf, "bufhidden", "wipe")
-    api.nvim_buf_set_option(buf, "modifiable", false)
-    api.nvim_buf_set_option(buf, "buftype", "nofile")
+    api.nvim_set_option_value("bufhidden", "wipe", { scope = "local", buf = buf })
+    api.nvim_set_option_value("modifiable", false, { scope = "local", buf = buf })
+    api.nvim_set_option_value("buftype", "nofile", { scope = "local", buf = buf })
     api.nvim_buf_set_keymap(buf, "n", "q", ":bd<CR>", {
         noremap = true,
         silent = true,

@@ -62,10 +62,10 @@ local function handler(err, TypeHierarchyItem, ctx)
         vim.bo.buftype = "nofile"
         vim.bo.bufhidden = "wipe"
         vim.bo.buflisted = true
-        api.nvim_win_set_option(0, "number", false)
-        api.nvim_win_set_option(0, "relativenumber", false)
-        api.nvim_win_set_option(0, "spell", false)
-        api.nvim_win_set_option(0, "cursorline", false)
+        api.nvim_set_option_value("number", false, { scope = "local", win = 0 })
+        api.nvim_set_option_value("relativenumber", false, { scope = "local", win = 0 })
+        api.nvim_set_option_value("spell", false, { scope = "local", win = 0 })
+        api.nvim_set_option_value("cursorline", false, { scope = "local", win = 0 })
         api.nvim_win_set_height(0, 1 + #lines)
 
         -- Set highlights

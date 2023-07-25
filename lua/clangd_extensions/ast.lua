@@ -107,7 +107,7 @@ local function handler(err, ASTNode)
         local source_buf = api.nvim_get_current_buf()
         vim.cmd(fmt([[vsplit %s:\ AST]], ASTNode.detail))
         local ast_buf = api.nvim_get_current_buf()
-        api.nvim_buf_set_option(ast_buf, "filetype", "ClangdAST")
+        api.nvim_set_option_value("filetype", "ClangdAST", { scope = "local", buf = ast_buf })
         if not M.node_pos[source_buf] then
             M.node_pos[source_buf] = {}
         end
@@ -121,10 +121,10 @@ local function handler(err, ASTNode)
         vim.bo.modifiable = false
         vim.bo.shiftwidth = 2
         vim.wo.foldmethod = "indent"
-        api.nvim_win_set_option(0, "number", false)
-        api.nvim_win_set_option(0, "relativenumber", false)
-        api.nvim_win_set_option(0, "spell", false)
-        api.nvim_win_set_option(0, "cursorline", false)
+        api.nvim_set_option_value("number", false, { scope = "local", win = 0 })
+        api.nvim_set_option_value("relativenumber", false, { scope = "local", win = 0 })
+        api.nvim_set_option_value("spell", false, { scope = "local", win = 0 })
+        api.nvim_set_option_value("cursorline", false, { scope = "local", win = 0 })
         setup_hl_autocmd(source_buf, ast_buf)
         highlight_detail(ast_buf)
     end
