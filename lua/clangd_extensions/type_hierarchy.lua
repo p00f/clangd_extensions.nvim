@@ -66,7 +66,10 @@ local function handler(err, TypeHierarchyItem, ctx)
         api.nvim_set_option_value("relativenumber", false, { scope = "local", win = 0 })
         api.nvim_set_option_value("spell", false, { scope = "local", win = 0 })
         api.nvim_set_option_value("cursorline", false, { scope = "local", win = 0 })
-        api.nvim_win_set_height(0, 1 + #lines)
+        local winbar = api.nvim_get_option_value("winbar", {})
+        local numlines = winbar == "" and #lines or #lines + 1
+        local winheight = math.max(numlines, 15)
+        api.nvim_win_set_height(0, winheight)
 
         -- Set highlights
         vim.cmd([[
