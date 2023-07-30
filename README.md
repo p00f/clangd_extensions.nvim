@@ -1,5 +1,7 @@
 ![clangd](https://user-images.githubusercontent.com/36493671/152692205-837ec826-54d0-4257-9894-cc1a7ac8a114.svg)
 
+Requires Neovim 0.7+
+
 ## Installation
 Install this plugin using any plugin/package manager or see [`:h packages`](https://neovim.io/doc/user/repeat.html#packages)
 
@@ -31,11 +33,11 @@ require("clangd_extensions").setup {
             -- Only show inlay hints for the current line
             only_current_line = false,
             -- Event which triggers a refersh of the inlay hints.
-            -- You can make this "CursorMoved" or "CursorMoved,CursorMovedI" but
+            -- You can make this { "CursorMoved" } or { "CursorMoved,CursorMovedI" } but
             -- not that this may cause  higher CPU usage.
             -- This option is only respected when only_current_line and
             -- autoSetHints both are true.
-            only_current_line_autocmd = "CursorHold",
+            only_current_line_autocmd = { "CursorHold" },
             -- whether to show parameter hints with the inlay hints or not
             show_parameter_hints = true,
             -- prefix for parameter hints

@@ -27,9 +27,6 @@ function M.prepare(opts)
         M.setup_comands()
     end
 
-    -- Set up AST state stuff
-    require("clangd_extensions.ast").init()
-
     return config.options.server
 end
 

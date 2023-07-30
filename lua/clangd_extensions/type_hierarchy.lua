@@ -48,7 +48,7 @@ local function handler(err, TypeHierarchyItem, ctx)
 
         -- Init
         M.offset_encoding[ctx.client_id] = vim.lsp.get_client_by_id(ctx.client_id).offset_encoding
-        vim.cmd(fmt([[split %s:\ type\ hierarchy]], TypeHierarchyItem.name))
+        vim.cmd.split(fmt("%s: type hierarchy", TypeHierarchyItem.name))
         local bufnr = vim.api.nvim_get_current_buf()
         M.type_to_location[bufnr] = {}
 

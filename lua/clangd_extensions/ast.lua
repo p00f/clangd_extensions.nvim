@@ -3,21 +3,28 @@ local api = vim.api
 local conf = require("clangd_extensions.config").options.extensions.ast
 
 local M = {}
+--- node_pos[source_buf][ast_buf][linenum] = { start = start, end = end }
+--- position of node in `source_buf` corresponding to line no. `linenum` in `ast_buf`
+M.node_pos = {}
+--- detail_pos[ast_buf][linenum] = { start = start, end = end }
+--- position of `detail` in line no. `linenum` of `ast_buf`
+M.detail_pos = {}
+M.nsid = vim.api.nvim_create_namespace("clangd_extensions")
 
 local function setup_hl_autocmd(source_buf, ast_buf)
-    vim.cmd(string.format(
-        [[
-    augroup ClangdExtensions
-    autocmd CursorMoved <buffer=%s> lua require("clangd_extensions.ast").update_highlight(%s,%s)
-    autocmd BufLeave <buffer=%s> lua require("clangd_extensions.ast").clear_highlight(%s)
-    augroup END
-    ]],
-        ast_buf,
-        source_buf,
-        ast_buf,
-        ast_buf,
-        source_buf
-    ))
+    api.nvim_create_augroup("ClangdExtensions", {})
+    api.nvim_create_autocmd("CursorMoved", {
+        buffer = ast_buf,
+        callback = function ()
+            M.update_highlight(source_buf, ast_buf)
+        end
+    })
+    api.nvim_create_autocmd("BufLeave", {
+        buffer = ast_buf,
+        callback = function ()
+            M.clear_highlight(source_buf)
+        end
+    })
 end
 
 local function icon_prefix(role, kind)
@@ -105,7 +112,7 @@ local function handler(err, ASTNode)
         return
     else
         local source_buf = api.nvim_get_current_buf()
-        vim.cmd(fmt([[vsplit %s:\ AST]], ASTNode.detail))
+        vim.cmd.vsplit(fmt("%s: AST", ASTNode.detail))
         local ast_buf = api.nvim_get_current_buf()
         api.nvim_set_option_value("filetype", "ClangdAST", { buf = ast_buf })
         if not M.node_pos[source_buf] then
@@ -128,16 +135,6 @@ local function handler(err, ASTNode)
         setup_hl_autocmd(source_buf, ast_buf)
         highlight_detail(ast_buf)
     end
-end
-
-function M.init()
-    --- node_pos[source_buf][ast_buf][linenum] = { start = start, end = end }
-    --- position of node in `source_buf` corresponding to line no. `linenum` in `ast_buf`
-    M.node_pos = {}
-    --- detail_pos[ast_buf][linenum] = { start = start, end = end }
-    --- position of `detail` in line no. `linenum` of `ast_buf`
-    M.detail_pos = {}
-    M.nsid = vim.api.nvim_create_namespace("clangd_extensions")
 end
 
 function M.clear_highlight(source_buf)

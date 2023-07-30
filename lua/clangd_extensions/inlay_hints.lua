@@ -22,28 +22,30 @@
 
 local M = {}
 local config = require("clangd_extensions.config")
+local api = vim.api
 
 -- Update inlay hints when opening a new buffer and when writing a buffer to a
 -- file
 -- opts is a string representation of the table of options
 function M.setup_autocmd()
-    local events = "BufEnter,BufWinEnter,TabEnter,BufWritePost"
+    local events = { "BufEnter", "BufWinEnter", "TabEnter", "BufWritePost" }
     if config.options.extensions.inlay_hints.only_current_line then
-        events = string.format(
-            "%s,%s",
-            events,
-            config.options.extensions.inlay_hints.only_current_line_autocmd
-        )
+        vim.list_extend(events, config.options.extensions.inlay_hints.only_current_line)
     end
 
-    vim.api.nvim_command("augroup ClangdInlayHints")
-    vim.api.nvim_command("au! * <buffer>")
-    vim.api.nvim_command(
-        "autocmd "
-        .. events
-        .. ' <buffer> lua require"clangd_extensions.inlay_hints".set_inlay_hints()'
-    )
-    vim.api.nvim_command("augroup END")
+    local augroup = vim.api.nvim_create_augroup("ClangdInlayHints", {})
+    local buffer = api.nvim_get_current_buf()
+    api.nvim_clear_autocmds({
+        buffer = buffer,
+        group = augroup,
+    })
+    api.nvim_create_autocmd(events, {
+        buffer = buffer,
+        group = augroup,
+        callback = function ()
+            M.set_inlay_hints()
+        end
+    })
 end
 
 local function get_params()
