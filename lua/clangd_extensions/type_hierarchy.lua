@@ -62,10 +62,10 @@ local function handler(err, TypeHierarchyItem, ctx)
         vim.bo.buftype = "nofile"
         vim.bo.bufhidden = "wipe"
         vim.bo.buflisted = true
-        api.nvim_set_option_value("number", false, { scope = "local", win = 0 })
-        api.nvim_set_option_value("relativenumber", false, { scope = "local", win = 0 })
-        api.nvim_set_option_value("spell", false, { scope = "local", win = 0 })
-        api.nvim_set_option_value("cursorline", false, { scope = "local", win = 0 })
+        api.nvim_set_option_value("number", false, { scope = "local" })
+        api.nvim_set_option_value("relativenumber", false, { scope = "local" })
+        api.nvim_set_option_value("spell", false, { scope = "local" })
+        api.nvim_set_option_value("cursorline", false, { scope = "local" })
         local winbar = api.nvim_get_option_value("winbar", {})
         local numlines = winbar == "" and #lines or #lines + 1
         local winheight = math.min(numlines, 15)
