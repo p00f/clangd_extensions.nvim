@@ -6,6 +6,7 @@ Requires Neovim 0.7+
 Install this plugin using any plugin/package manager or see [`:h packages`](https://neovim.io/doc/user/repeat.html#packages)
 
 ## Configuration:
+**You don't need to call setup if you don't need inlay hints and are fine with the default settings for AST, memory usage and symbol info** - in this case, just install the plugin and use nvim-lspconfig or `vim.lsp.start` like you normally would.
 
 Calling `setup` will instruct `clangd_extensions` to configure lsp via lspconfig automatically. So if you use it, remove `require'lspconfig'.clangd.setup{}` from your config. Use the `server` config field to customize lspconfig settings.
 
