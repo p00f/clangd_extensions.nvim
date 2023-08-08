@@ -6,78 +6,60 @@ Requires Neovim 0.7+
 Install this plugin using any plugin/package manager or see [`:h packages`](https://neovim.io/doc/user/repeat.html#packages)
 
 ## Configuration:
-**You don't need to call setup if you don't need inlay hints** (you don't if you use neovim 0.10, see `:h vim.lsp.inlay_hint()`) **and are fine with the default settings for AST, memory usage and symbol info** - in this case, just install the plugin and use nvim-lspconfig or `vim.lsp.start` like you normally would.
-
-Calling `setup` will instruct `clangd_extensions` to configure lsp via lspconfig automatically. So if you use it, remove `require'lspconfig'.clangd.setup{}` from your config. Use the `server` config field to customize lspconfig settings.
-
-If you prefer to integrate `clangd_extensions` into your own LSP setup, `require("clangd_extensions").prepare()` applies passed configuration to `clangd_extensions` and returns lspconfig configuration table for further processing. Any customisations passed to `server` config field will be present in this returned configuration.
-
-### Default configuration
-
-You can call `require("clangd_extensions").setup()` or `require("clangd_extensions").prepare()` with no arguments if you don't want to make changes.
-
+You don't need to call `require("clangd_extensions").setup` if you like the defaults:
 ```lua
-require("clangd_extensions").setup {
-    server = {
-        -- options to pass to nvim-lspconfig
-        -- i.e. the arguments to require("lspconfig").clangd.setup({})
+require("clangd_extensions").setup({
+    inlay_hints = {
+        inline = vim.fn.has("nvim-0.10") == 1,
+        -- Options other than `highlight' and `priority' only work
+        -- if `inline' is disabled
+        -- Only show inlay hints for the current line
+        only_current_line = false,
+        -- Event which triggers a refresh of the inlay hints.
+        -- You can make this { "CursorMoved" } or { "CursorMoved,CursorMovedI" } but
+        -- not that this may cause  higher CPU usage.
+        -- This option is only respected when only_current_line and
+        -- autoSetHints both are true.
+        only_current_line_autocmd = { "CursorHold" },
+        -- whether to show parameter hints with the inlay hints or not
+        show_parameter_hints = true,
+        -- prefix for parameter hints
+        parameter_hints_prefix = "<- ",
+        -- prefix for all the other hints (type, chaining)
+        other_hints_prefix = "=> ",
+        -- whether to align to the length of the longest line in the file
+        max_len_align = false,
+        -- padding from the left if max_len_align is true
+        max_len_align_padding = 1,
+        -- whether to align to the extreme right or not
+        right_align = false,
+        -- padding from the right if right_align is true
+        right_align_padding = 7,
+        -- The color of the hints
+        highlight = "Comment",
+        -- The highlight group priority for extmark
+        priority = 100,
     },
-    extensions = {
-        -- defaults:
-        -- Automatically set inlay hints (type hints)
-        autoSetHints = vim.fn.has("nvim-0.10") ~= 1,
-        -- These apply to the default ClangdSetInlayHints command
-        inlay_hints = {
-            inline = vim.fn.has("nvim-0.10") == 1,
-            -- Options other than `highlight' and `priority' only work
-            -- if `inline' is disabled
-            -- Only show inlay hints for the current line
-            only_current_line = false,
-            -- Event which triggers a refersh of the inlay hints.
-            -- You can make this { "CursorMoved" } or { "CursorMoved,CursorMovedI" } but
-            -- not that this may cause  higher CPU usage.
-            -- This option is only respected when only_current_line and
-            -- autoSetHints both are true.
-            only_current_line_autocmd = { "CursorHold" },
-            -- whether to show parameter hints with the inlay hints or not
-            show_parameter_hints = true,
-            -- prefix for parameter hints
-            parameter_hints_prefix = "<- ",
-            -- prefix for all the other hints (type, chaining)
-            other_hints_prefix = "=> ",
-            -- whether to align to the length of the longest line in the file
-            max_len_align = false,
-            -- padding from the left if max_len_align is true
-            max_len_align_padding = 1,
-            -- whether to align to the extreme right or not
-            right_align = false,
-            -- padding from the right if right_align is true
-            right_align_padding = 7,
-            -- The color of the hints
-            highlight = "Comment",
-            -- The highlight group priority for extmark
-            priority = 100,
+    ast = {
+        -- These are unicode, should be available in any font
+        role_icons = {
+            type = "🄣",
+            declaration = "🄓",
+            expression = "🄔",
+            statement = ";",
+            specifier = "🄢",
+            ["template argument"] = "🆃",
         },
-        ast = {
-            -- These are unicode, should be available in any font
-            role_icons = {
-                 type = "🄣",
-                 declaration = "🄓",
-                 expression = "🄔",
-                 statement = ";",
-                 specifier = "🄢",
-                 ["template argument"] = "🆃",
-            },
-            kind_icons = {
-                Compound = "🄲",
-                Recovery = "🅁",
-                TranslationUnit = "🅄",
-                PackExpansion = "🄿",
-                TemplateTypeParm = "🅃",
-                TemplateTemplateParm = "🅃",
-                TemplateParamObject = "🅃",
-            },
-            --[[ These require codicons (https://github.com/microsoft/vscode-codicons)
+        kind_icons = {
+            Compound = "🄲",
+            Recovery = "🅁",
+            TranslationUnit = "🅄",
+            PackExpansion = "🄿",
+            TemplateTypeParm = "🅃",
+            TemplateTemplateParm = "🅃",
+            TemplateParamObject = "🅃",
+        },
+        --[[ These require codicons (https://github.com/microsoft/vscode-codicons)
             role_icons = {
                 type = "",
                 declaration = "",
@@ -97,24 +79,27 @@ require("clangd_extensions").setup {
                 TemplateParamObject = "",
             }, ]]
 
-            highlights = {
-                detail = "Comment",
-            },
-        },
-        memory_usage = {
-            border = "none",
-        },
-        symbol_info = {
-            border = "none",
+        highlights = {
+            detail = "Comment",
         },
     },
-}
+    memory_usage = {
+        border = "none",
+    },
+    symbol_info = {
+        border = "none",
+    },
+})
 ```
 ## Features:
 ### [Inlay hints](https://clangd.llvm.org/extensions#inlay-hints)
 ![image](https://user-images.githubusercontent.com/36493671/152699601-61ad1640-96bf-4082-b553-75d4085c3496.png)
 #### Usage
-See configuration instructions above
+Add this to your nvim-lspconfig / `vim.lsp.start()`'s `on_attach`:
+```lua
+require("clangd_extensions.inlay_hints").setup_autocmd()
+require("clangd_extensions.inlay_hints").set_inlay_hints()
+```
 ### [View AST](https://clangd.llvm.org/extensions#ast)
 ![image](https://user-images.githubusercontent.com/36493671/255611133-35f397d3-02f8-4d14-b70a-126be6c098fa.gif)
 You can fold nodes using `zc` and friends - the AST window has `shiftwidth=2` and `foldmethod=indent`.

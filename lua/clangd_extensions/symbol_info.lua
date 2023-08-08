@@ -1,5 +1,3 @@
-local config = require("clangd_extensions.config")
-
 local function handler(err, result)
     if err or (#result == 0) then
         return
@@ -11,7 +9,7 @@ local function handler(err, result)
         width = math.max(string.len(name_str), string.len(container_str)),
         focusable = false,
         focus = false,
-        border = config.options.extensions.symbol_info.border,
+        border = require("clangd_extensions.config").options.symbol_info.border,
     })
 end
 

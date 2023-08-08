@@ -1,6 +1,6 @@
 local fmt = string.format
 local api = vim.api
-local conf = require("clangd_extensions.config").options.extensions.ast
+local conf = require("clangd_extensions.config").options.ast
 
 local M = {}
 --- node_pos[source_buf][ast_buf][linenum] = { start = start, end = end }
@@ -12,14 +12,16 @@ M.detail_pos = {}
 M.nsid = vim.api.nvim_create_namespace("clangd_extensions")
 
 local function setup_hl_autocmd(source_buf, ast_buf)
-    api.nvim_create_augroup("ClangdExtensions", {})
+    local group = api.nvim_create_augroup("ClangdExtensions", {})
     api.nvim_create_autocmd("CursorMoved", {
+        group = group,
         buffer = ast_buf,
         callback = function ()
             M.update_highlight(source_buf, ast_buf)
         end
     })
     api.nvim_create_autocmd("BufLeave", {
+        group = group,
         buffer = ast_buf,
         callback = function ()
             M.clear_highlight(source_buf)
