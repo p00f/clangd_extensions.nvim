@@ -6,6 +6,7 @@ Requires Neovim 0.7+
 Install this plugin using any plugin/package manager or see [`:h packages`](https://neovim.io/doc/user/repeat.html#packages)
 
 ## Configuration:
+Set up clangd via lspconfig/vim.lsp.start, as usual.
 You don't need to call `require("clangd_extensions").setup` if you like the defaults:
 ```lua
 require("clangd_extensions").setup({
