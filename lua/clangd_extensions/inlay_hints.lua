@@ -30,7 +30,7 @@ local api = vim.api
 function M.setup_autocmd()
     local events = { "BufEnter", "BufWinEnter", "TabEnter", "BufWritePost" }
     if config.options.inlay_hints.only_current_line then
-        vim.list_extend(events, config.options.inlay_hints.only_current_line)
+        vim.list_extend(events, config.options.inlay_hints.only_current_line_autocmd)
     end
 
     local augroup = vim.api.nvim_create_augroup("ClangdInlayHints", {})
@@ -249,6 +249,7 @@ local function inline_handler(err, result, ctx)
     if vim.api.nvim_get_current_buf() ~= bufnr then
         return
     end
+    local current_line = vim.api.nvim_win_get_cursor(0)[1]
 
     -- clean it up first
     M.disable_inlay_hints()
@@ -262,15 +263,17 @@ local function inline_handler(err, result, ctx)
             text = text .. " "
         end
         local line = hint.position.line
-        local col = hint.position.character
-        vim.api.nvim_buf_set_extmark(bufnr, namespace, line, col, {
-            virt_text_pos = "inline",
-            virt_text = {
-                { text, config.options.inlay_hints.highlight },
-            },
-            hl_mode = "combine",
-            priority = config.options.inlay_hints.priority,
-        })
+        if line == current_line - 1 then
+            local col = hint.position.character
+            vim.api.nvim_buf_set_extmark(bufnr, namespace, line, col, {
+                virt_text_pos = "inline",
+                virt_text = {
+                    { text, config.options.inlay_hints.highlight },
+                },
+                hl_mode = "combine",
+                priority = config.options.inlay_hints.priority,
+            })
+        end
     end
 end
 
