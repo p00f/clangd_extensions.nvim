@@ -263,7 +263,7 @@ local function inline_handler(err, result, ctx)
             text = text .. " "
         end
         local line = hint.position.line
-        if line == current_line - 1 then
+        if line == current_line - 1 or not config.options.inlay_hints.only_current_line then
             local col = hint.position.character
             vim.api.nvim_buf_set_extmark(bufnr, namespace, line, col, {
                 virt_text_pos = "inline",
