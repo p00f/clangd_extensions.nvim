@@ -16,16 +16,12 @@ local function setup_hl_autocmd(source_buf, ast_buf)
     api.nvim_create_autocmd("CursorMoved", {
         group = group,
         buffer = ast_buf,
-        callback = function ()
-            M.update_highlight(source_buf, ast_buf)
-        end
+        callback = function() M.update_highlight(source_buf, ast_buf) end,
     })
     api.nvim_create_autocmd("BufLeave", {
         group = group,
         buffer = ast_buf,
-        callback = function ()
-            M.clear_highlight(source_buf)
-        end
+        callback = function() M.clear_highlight(source_buf) end,
     })
 end
 
@@ -117,9 +113,7 @@ local function handler(err, ASTNode)
         vim.cmd.vsplit(fmt("%s: AST", ASTNode.detail))
         local ast_buf = api.nvim_get_current_buf()
         api.nvim_set_option_value("filetype", "ClangdAST", { buf = ast_buf })
-        if not M.node_pos[source_buf] then
-            M.node_pos[source_buf] = {}
-        end
+        if not M.node_pos[source_buf] then M.node_pos[source_buf] = {} end
         M.node_pos[source_buf][ast_buf] = {}
         M.detail_pos[ast_buf] = {}
 
@@ -139,15 +133,11 @@ local function handler(err, ASTNode)
     end
 end
 
-function M.clear_highlight(source_buf)
-    api.nvim_buf_clear_namespace(source_buf, M.nsid, 0, -1)
-end
+function M.clear_highlight(source_buf) api.nvim_buf_clear_namespace(source_buf, M.nsid, 0, -1) end
 
 function M.update_highlight(source_buf, ast_buf)
     M.clear_highlight(source_buf)
-    if api.nvim_get_current_buf() ~= ast_buf then
-        return
-    end
+    if api.nvim_get_current_buf() ~= ast_buf then return end
     local curline = vim.fn.getcurpos()[2]
     local curline_ranges = M.node_pos[source_buf][ast_buf][curline]
     if curline_ranges then

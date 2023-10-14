@@ -93,6 +93,9 @@ require("clangd_extensions").setup({
 })
 ```
 ## Features:
+### Switch between source/header
+### Usage
+`:ClangdSwitchSourceHeader`
 ### [Inlay hints](https://clangd.llvm.org/extensions#inlay-hints)
 ![image](https://user-images.githubusercontent.com/36493671/152699601-61ad1640-96bf-4082-b553-75d4085c3496.png)
 #### Usage
@@ -156,7 +159,7 @@ You can fold items using `zc` and friends - the memory usage window has `shiftwi
 
  ☑️ Inlay hints (implemented)
 
- ☑️ Switch between source/header (nvim-lspconfig already does this)
+ ☑️ Switch between source/header (implemented)
 
  ☑️ File status (see lsp-status.nvim)
 

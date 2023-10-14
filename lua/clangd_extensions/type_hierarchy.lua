@@ -38,7 +38,6 @@ local function format_tree(node, visited, result, padding, type_to_location)
     return result
 end
 
-
 local function handler(err, TypeHierarchyItem, ctx)
     if err or not TypeHierarchyItem then
         return
@@ -93,9 +92,7 @@ local function handler(err, TypeHierarchyItem, ctx)
         api.nvim_create_autocmd("BufWipeOut", {
             buffer = bufnr,
             group = type_hierarchy_augroup,
-            callback = function()
-                M.type_to_location[bufnr] = nil
-            end
+            callback = function() M.type_to_location[bufnr] = nil end,
         })
     end
 end

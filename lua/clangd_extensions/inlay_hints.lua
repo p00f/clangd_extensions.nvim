@@ -42,15 +42,11 @@ function M.setup_autocmd()
     api.nvim_create_autocmd(events, {
         buffer = buffer,
         group = augroup,
-        callback = function ()
-            M.set_inlay_hints()
-        end
+        callback = function() M.set_inlay_hints() end,
     })
 end
 
-local function get_params()
-    return { textDocument = vim.lsp.util.make_text_document_params() }
-end
+local function get_params() return { textDocument = vim.lsp.util.make_text_document_params() } end
 
 local function get_inline_params()
     return {
@@ -63,8 +59,8 @@ local function get_inline_params()
             ["end"] = {
                 line = vim.api.nvim_buf_line_count(0),
                 character = 0,
-            }
-        }
+            },
+        },
     }
 end
 
@@ -107,9 +103,7 @@ local function parseHints(result)
     local map = {}
     local only_current_line = config.options.inlay_hints.only_current_line
 
-    if type(result) ~= "table" then
-        return {}
-    end
+    if type(result) ~= "table" then return {} end
     for _, value in pairs(result) do
         local line = tostring(value.range["end"].line)
         local label = value.label
@@ -125,9 +119,7 @@ local function parseHints(result)
         end
 
         if only_current_line then
-            if line == tostring(current_line - 1) then
-                add_line()
-            end
+            if line == tostring(current_line - 1) then add_line() end
         else
             add_line()
         end
@@ -136,15 +128,11 @@ local function parseHints(result)
 end
 
 local function handler(err, result, ctx)
-    if err then
-        return
-    end
+    if err then return end
     local opts = config.options.inlay_hints
     local bufnr = ctx.bufnr
 
-    if vim.api.nvim_get_current_buf() ~= bufnr then
-        return
-    end
+    if vim.api.nvim_get_current_buf() ~= bufnr then return end
 
     -- clean it up at first
     M.disable_inlay_hints()
@@ -179,9 +167,7 @@ local function handler(err, result, ctx)
                     table.insert(param_hints, value_inner.label:sub(1, -3))
                 else
                     local hint_text = value_inner.label
-                    if hint_text:sub(1, 2) == ": " then
-                        hint_text = hint_text:sub(3)
-                    end
+                    if hint_text:sub(1, 2) == ": " then hint_text = hint_text:sub(3) end
                     table.insert(other_hints, hint_text)
                 end
             end
@@ -191,9 +177,7 @@ local function handler(err, result, ctx)
                 virt_text = virt_text .. opts.parameter_hints_prefix .. "("
                 for i, value_inner_inner in ipairs(param_hints) do
                     virt_text = virt_text .. value_inner_inner
-                    if i ~= #param_hints then
-                        virt_text = virt_text .. ", "
-                    end
+                    if i ~= #param_hints then virt_text = virt_text .. ", " end
                 end
                 virt_text = virt_text .. ") "
             end
@@ -203,9 +187,7 @@ local function handler(err, result, ctx)
                 virt_text = virt_text .. opts.other_hints_prefix
                 for i, value_inner_inner in ipairs(other_hints) do
                     virt_text = virt_text .. value_inner_inner
-                    if i ~= #other_hints then
-                        virt_text = virt_text .. ", "
-                    end
+                    if i ~= #other_hints then virt_text = virt_text .. ", " end
                 end
             end
 
@@ -217,16 +199,13 @@ local function handler(err, result, ctx)
             if config.options.inlay_hints.max_len_align then
                 virt_text = string.rep(
                     " ",
-                    max_len
-                    - current_line_len
-                    + config.options.inlay_hints.max_len_align_padding
+                    max_len - current_line_len + config.options.inlay_hints.max_len_align_padding
                 ) .. virt_text
             end
 
             -- set the virtual text
             vim.api.nvim_buf_set_extmark(bufnr, namespace, line, 0, {
-                virt_text_pos = config.options.inlay_hints.right_align and "right_align"
-                    or "eol",
+                virt_text_pos = config.options.inlay_hints.right_align and "right_align" or "eol",
                 virt_text = {
                     { virt_text, config.options.inlay_hints.highlight },
                 },
@@ -241,14 +220,10 @@ local function handler(err, result, ctx)
 end
 
 local function inline_handler(err, result, ctx)
-    if err then
-        return
-    end
+    if err then return end
     local bufnr = ctx.bufnr
 
-    if vim.api.nvim_get_current_buf() ~= bufnr then
-        return
-    end
+    if vim.api.nvim_get_current_buf() ~= bufnr then return end
     local current_line = vim.api.nvim_win_get_cursor(0)[1]
 
     -- clean it up first
@@ -256,12 +231,8 @@ local function inline_handler(err, result, ctx)
 
     for _, hint in pairs(result) do
         local text = hint.label
-        if hint.paddingLeft then
-            text = " " .. text
-        end
-        if hint.paddingRight then
-            text = text .. " "
-        end
+        if hint.paddingLeft then text = " " .. text end
+        if hint.paddingRight then text = text .. " " end
         local line = hint.position.line
         if line == current_line - 1 or not config.options.inlay_hints.only_current_line then
             local col = hint.position.character
@@ -299,7 +270,12 @@ function M.set_inlay_hints()
     for _, c in pairs(clients) do
         if c.name == "clangd" then
             if config.options.inlay_hints.inline then
-                vim.lsp.buf_request(0, "textDocument/inlayHint", get_inline_params(), inline_handler)
+                vim.lsp.buf_request(
+                    0,
+                    "textDocument/inlayHint",
+                    get_inline_params(),
+                    inline_handler
+                )
             else
                 vim.lsp.buf_request(0, "clangd/inlayHints", get_params(), handler)
             end

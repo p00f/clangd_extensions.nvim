@@ -36,3 +36,7 @@ create_command(
         end
     }
 )
+
+create_command('ClangdSwitchSourceHeader', function()
+    require("clangd_extensions.switch_source_header").switch_source_header()
+end, {})

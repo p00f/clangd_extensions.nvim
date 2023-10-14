@@ -3,9 +3,7 @@ local fmt = string.format
 
 local function display(lines)
     for k, line in pairs(lines) do -- Pad lines
-        if k ~= 1 then
-            lines[k] = "  " .. line .. "  "
-        end
+        if k ~= 1 then lines[k] = "  " .. line .. "  " end
     end
     local vim_width = api.nvim_get_option("columns")
     local vim_height = api.nvim_get_option("lines")
@@ -40,13 +38,9 @@ local function display(lines)
 end
 
 local function format_name(name)
-    if name:sub(1, 7) == "file://" then
-        name = vim.uri_to_fname(name)
-    end
+    if name:sub(1, 7) == "file://" then name = vim.uri_to_fname(name) end
     local cwd = vim.fn.getcwd()
-    if name:sub(1, string.len(cwd)) == cwd then
-        name = name:sub(string.len(cwd) + 2, -1)
-    end
+    if name:sub(1, string.len(cwd)) == cwd then name = name:sub(string.len(cwd) + 2, -1) end
     return name
 end
 
@@ -88,18 +82,19 @@ local function format_tree(node, visited, result, padding, prefix, expand_preamb
 end
 
 local function handler(err, result, expand_preamble)
-    if err then
-        return
-    end
+    if err then return end
     display(format_tree(result, {}, { "" }, "", "", expand_preamble))
 end
 
 local M = {}
 
 function M.show_memory_usage(expand_preamble)
-    vim.lsp.buf_request(0, "$/memoryUsage", nil, function(err, result)
-        handler(err, result, expand_preamble)
-    end)
+    vim.lsp.buf_request(
+        0,
+        "$/memoryUsage",
+        nil,
+        function(err, result) handler(err, result, expand_preamble) end
+    )
 end
 
 return M
