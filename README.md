@@ -93,7 +93,7 @@ require("clangd_extensions").setup({
 })
 ```
 ## Features:
-### Switch between source/header
+### [Switch between source/header](https://clangd.llvm.org/extensions#switch-between-sourceheader)
 ### Usage
 `:ClangdSwitchSourceHeader`
 ### [Inlay hints](https://clangd.llvm.org/extensions#inlay-hints)
@@ -149,23 +149,23 @@ You can fold items using `zc` and friends - the memory usage window has `shiftwi
 `:ClangdMemoryUsage`. Preamble can be large so it is collapsed by default, to expand it use `:ClangdMemoryUsage expand_preamble`
 
 ## Implementation status of [extensions](https://clangd.llvm.org/extensions)
- ☑️ Memory usage (implemented)
+ ☑️ Memory usage
 
- ☑️ AST (implemented)
+ ☑️ AST
 
- ☑️ Symbol info request (implemented)
+ ☑️ Symbol info request
 
- ☑️ Type hierarchy (implemented)
+ ☑️ Type hierarchy
 
- ☑️ Inlay hints (implemented)
+ ☑️ Inlay hints
 
- ☑️ Switch between source/header (implemented)
+ ☑️ Switch between source/header
 
  ☑️ File status (see lsp-status.nvim)
 
- ☑️ Compilation commands (can be specified in lspconfig `init_options`)
+ ☑️ Compilation commands (can be specified in `vim.lsp.start()`/lspconfig `init_options` and `settings`)
 
- ☑️ Code completion scores (implemented)
+ ☑️ Code completion scores
 
  ⬜ Force diagnostics generation (not sure)
 ## Credits
