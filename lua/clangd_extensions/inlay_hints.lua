@@ -30,7 +30,10 @@ local api = vim.api
 function M.setup_autocmd()
     local events = { "BufEnter", "BufWinEnter", "TabEnter", "BufWritePost" }
     if config.options.inlay_hints.only_current_line then
-        vim.list_extend(events, config.options.inlay_hints.only_current_line_autocmd)
+        vim.list_extend(
+            events,
+            config.options.inlay_hints.only_current_line_autocmd
+        )
     end
 
     local augroup = vim.api.nvim_create_augroup("ClangdInlayHints", {})
@@ -42,11 +45,9 @@ function M.setup_autocmd()
     api.nvim_create_autocmd(events, {
         buffer = buffer,
         group = augroup,
-        callback = function() M.set_inlay_hints() end,
+        callback = M.set_inlay_hints,
     })
 end
-
-local function get_params() return { textDocument = vim.lsp.util.make_text_document_params() } end
 
 local function get_inline_params()
     return {
@@ -142,7 +143,8 @@ local function handler(err, result, ctx)
 
     for key, _ in pairs(ret) do
         local line = tonumber(key)
-        local current_line = vim.api.nvim_buf_get_lines(bufnr, line, line + 1, false)[1]
+        local current_line =
+            vim.api.nvim_buf_get_lines(bufnr, line, line + 1, false)[1]
         if current_line then
             local current_line_len = string.len(current_line)
             max_len = math.max(max_len, current_line_len)
@@ -153,7 +155,8 @@ local function handler(err, result, ctx)
         local virt_text = ""
         local line = tonumber(key)
 
-        local current_line = vim.api.nvim_buf_get_lines(bufnr, line, line + 1, false)[1]
+        local current_line =
+            vim.api.nvim_buf_get_lines(bufnr, line, line + 1, false)[1]
 
         if current_line then
             local current_line_len = string.len(current_line)
@@ -167,13 +170,17 @@ local function handler(err, result, ctx)
                     table.insert(param_hints, value_inner.label:sub(1, -3))
                 else
                     local hint_text = value_inner.label
-                    if hint_text:sub(1, 2) == ": " then hint_text = hint_text:sub(3) end
+                    if hint_text:sub(1, 2) == ": " then
+                        hint_text = hint_text:sub(3)
+                    end
                     table.insert(other_hints, hint_text)
                 end
             end
 
             -- show parameter hints inside brackets with commas and a thin arrow
-            if not vim.tbl_isempty(param_hints) and opts.show_parameter_hints then
+            if
+                not vim.tbl_isempty(param_hints) and opts.show_parameter_hints
+            then
                 virt_text = virt_text .. opts.parameter_hints_prefix .. "("
                 for i, value_inner_inner in ipairs(param_hints) do
                     virt_text = virt_text .. value_inner_inner
@@ -193,19 +200,26 @@ local function handler(err, result, ctx)
 
             if config.options.inlay_hints.right_align then
                 virt_text = virt_text
-                    .. string.rep(" ", config.options.inlay_hints.right_align_padding)
+                    .. string.rep(
+                        " ",
+                        config.options.inlay_hints.right_align_padding
+                    )
             end
 
             if config.options.inlay_hints.max_len_align then
                 virt_text = string.rep(
                     " ",
-                    max_len - current_line_len + config.options.inlay_hints.max_len_align_padding
+                    max_len
+                        - current_line_len
+                        + config.options.inlay_hints.max_len_align_padding
                 ) .. virt_text
             end
 
             -- set the virtual text
             vim.api.nvim_buf_set_extmark(bufnr, namespace, line, 0, {
-                virt_text_pos = config.options.inlay_hints.right_align and "right_align" or "eol",
+                virt_text_pos = config.options.inlay_hints.right_align
+                        and "right_align"
+                    or "eol",
                 virt_text = {
                     { virt_text, config.options.inlay_hints.highlight },
                 },
@@ -234,7 +248,10 @@ local function inline_handler(err, result, ctx)
         if hint.paddingLeft then text = " " .. text end
         if hint.paddingRight then text = text .. " " end
         local line = hint.position.line
-        if line == current_line - 1 or not config.options.inlay_hints.only_current_line then
+        if
+            line == current_line - 1
+            or not config.options.inlay_hints.only_current_line
+        then
             local col = hint.position.character
             vim.api.nvim_buf_set_extmark(bufnr, namespace, line, col, {
                 virt_text_pos = "inline",
@@ -277,7 +294,12 @@ function M.set_inlay_hints()
                     inline_handler
                 )
             else
-                vim.lsp.buf_request(0, "clangd/inlayHints", get_params(), handler)
+                vim.lsp.buf_request(
+                    0,
+                    "clangd/inlayHints",
+                    { textDocument = vim.lsp.util.make_text_document_params() },
+                    handler
+                )
             end
             break
         end

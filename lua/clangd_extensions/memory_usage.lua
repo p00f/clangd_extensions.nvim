@@ -40,13 +40,25 @@ end
 local function format_name(name)
     if name:sub(1, 7) == "file://" then name = vim.uri_to_fname(name) end
     local cwd = vim.fn.getcwd()
-    if name:sub(1, string.len(cwd)) == cwd then name = name:sub(string.len(cwd) + 2, -1) end
+    if name:sub(1, string.len(cwd)) == cwd then
+        name = name:sub(string.len(cwd) + 2, -1)
+    end
     return name
 end
 
-local function format_tree(node, visited, result, padding, prefix, expand_preamble)
+local function format_tree(
+    node,
+    visited,
+    result,
+    padding,
+    prefix,
+    expand_preamble
+)
     if padding == "" then
-        table.insert(result, fmt("Total: self = %s, total = %s", node._self, node._total))
+        table.insert(
+            result,
+            fmt("Total: self = %s, total = %s", node._self, node._total)
+        )
     end
     visited[prefix] = true
     for child_name, child_node in pairs(node) do

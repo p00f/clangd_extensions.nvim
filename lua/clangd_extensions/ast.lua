@@ -53,7 +53,9 @@ local function describe(role, kind, detail)
     if detail then
         detailpos = {
             start = string.len(str) + vim.fn.strlen(icon) + 1,
-            ["end"] = string.len(str) + vim.fn.strlen(icon) + string.len(detail) + 1,
+            ["end"] = string.len(str) + vim.fn.strlen(icon) + string.len(
+                detail
+            ) + 1,
         }
         str = str .. " " .. detail
     end
@@ -117,7 +119,13 @@ local function handler(err, ASTNode)
         M.node_pos[source_buf][ast_buf] = {}
         M.detail_pos[ast_buf] = {}
 
-        local lines = walk_tree(ASTNode, {}, {}, "", { source_buf = source_buf, ast_buf = ast_buf })
+        local lines = walk_tree(
+            ASTNode,
+            {},
+            {},
+            "",
+            { source_buf = source_buf, ast_buf = ast_buf }
+        )
         api.nvim_buf_set_lines(ast_buf, 0, -1, true, lines)
         vim.bo.buftype = "nofile"
         vim.bo.bufhidden = "wipe"
@@ -133,7 +141,9 @@ local function handler(err, ASTNode)
     end
 end
 
-function M.clear_highlight(source_buf) api.nvim_buf_clear_namespace(source_buf, M.nsid, 0, -1) end
+function M.clear_highlight(source_buf)
+    api.nvim_buf_clear_namespace(source_buf, M.nsid, 0, -1)
+end
 
 function M.update_highlight(source_buf, ast_buf)
     M.clear_highlight(source_buf)
