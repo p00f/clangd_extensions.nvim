@@ -1,6 +1,6 @@
 local function handler(_err, uri)
     if not uri or uri == "" then
-        vim.api.nvim_echo("Corresponding file cannot be determined", false)
+        vim.api.nvim_echo({ { "Corresponding file cannot be determined" } }, false, {})
         return
     end
     local file_name = vim.uri_to_fname(uri)
