@@ -104,6 +104,37 @@ Add this to your nvim-lspconfig / `vim.lsp.start()`'s `on_attach`:
 require("clangd_extensions.inlay_hints").setup_autocmd()
 require("clangd_extensions.inlay_hints").set_inlay_hints()
 ```
+
+You can also enable, disable or toggle the hints with `ClangdSetInlayHints`, `ClangdDisableInlayHints` and `ClangdToggleInlayHints`.
+Toggling returns the current state of the hints, this is useful if you want to hook a callback when toggling inlay hints:
+```lua
+if require("clangd_extensions.inlay_hints").toggle_inlay_hints() then
+    -- Inlay hints are enabled
+else
+    -- Inlay hints are disabled
+end
+```
+For example if you have autocommands related to Clangd inlay hints you might want to disable/enable them when toggling inlay hints:
+```lua
+on_attach = function(_, buf)
+    local group = vim.api.nvim_create_augroup("clangd_no_inlay_hints_in_insert", { clear = true })
+
+    vim.keymap.set("n", "<leader>lh", function()
+        if require("clangd_extensions.inlay_hints").toggle_inlay_hints() then
+            vim.api.nvim_create_autocmd("InsertEnter", { group = group, buffer = buf,
+                callback = require("clangd_extensions.inlay_hints").disable_inlay_hints
+            })
+            vim.api.nvim_create_autocmd({ "TextChanged", "InsertLeave" }, { group = group, buffer = buf,
+                callback = require("clangd_extensions.inlay_hints").set_inlay_hints
+            })
+        else
+            vim.api.nvim_clear_autocmds({ group = group, buffer = buf })
+        end
+    end, { buffer = buf, desc = "[l]sp [h]ints toggle" })
+end,
+}
+```
+
 ### [View AST](https://clangd.llvm.org/extensions#ast)
 ![image](https://user-images.githubusercontent.com/36493671/255611133-35f397d3-02f8-4d14-b70a-126be6c098fa.gif)
 You can fold nodes using `zc` and friends - the AST window has `shiftwidth=2` and `foldmethod=indent`.

@@ -272,6 +272,7 @@ function M.toggle_inlay_hints()
         M.set_inlay_hints()
     end
     enabled = not enabled
+    return enabled
 end
 
 function M.disable_inlay_hints()
