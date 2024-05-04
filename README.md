@@ -18,9 +18,8 @@ require("clangd_extensions").setup({
         only_current_line = false,
         -- Event which triggers a refresh of the inlay hints.
         -- You can make this { "CursorMoved" } or { "CursorMoved,CursorMovedI" } but
-        -- not that this may cause  higher CPU usage.
-        -- This option is only respected when only_current_line and
-        -- autoSetHints both are true.
+        -- note that this may cause higher CPU usage.
+        -- This option is only respected when only_current_line is true.
         only_current_line_autocmd = { "CursorHold" },
         -- whether to show parameter hints with the inlay hints or not
         show_parameter_hints = true,
