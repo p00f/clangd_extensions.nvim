@@ -234,7 +234,7 @@ local function handler(err, result, ctx)
 end
 
 local function inline_handler(err, result, ctx)
-    if err then return end
+    if err or not result then return end
     local bufnr = ctx.bufnr
 
     if vim.api.nvim_get_current_buf() ~= bufnr then return end
