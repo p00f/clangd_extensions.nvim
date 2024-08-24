@@ -5,8 +5,8 @@ local function display(lines)
     for k, line in pairs(lines) do -- Pad lines
         if k ~= 1 then lines[k] = "  " .. line .. "  " end
     end
-    local vim_width = api.nvim_get_option("columns")
-    local vim_height = api.nvim_get_option("lines")
+    local vim_width = api.nvim_get_option_value("columns", { scope = "local" })
+    local vim_height = api.nvim_get_option_value("lines", { scope = "local" })
     local height = math.ceil(vim_height * 0.7 - 4)
     local width = math.ceil(vim_width * 0.7)
     local row = math.ceil((vim_height - height) / 2 - 1)
