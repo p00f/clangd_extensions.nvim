@@ -21,19 +21,21 @@ local function display(lines)
         col = col,
         border = require("clangd_extensions.config").options.memory_usage.border,
     })
-    vim.bo.shiftwidth = 2
+    vim.bo[buf].shiftwidth = 2
     vim.wo.foldmethod = "indent"
     api.nvim_buf_set_lines(buf, 0, -1, true, lines)
     api.nvim_set_option_value("bufhidden", "wipe", { buf = buf })
     api.nvim_set_option_value("modifiable", false, { buf = buf })
     api.nvim_set_option_value("buftype", "nofile", { buf = buf })
-    api.nvim_buf_set_keymap(buf, "n", "q", ":bd<CR>", {
+    vim.keymap.set("n", "q", ":bd<CR>", {
         noremap = true,
         silent = true,
+        buffer = buf,
     })
-    api.nvim_buf_set_keymap(buf, "n", "<ESC>", ":bd<CR>", {
+    vim.keymap.set("n", "<ESC>", ":bd<CR>", {
         noremap = true,
         silent = true,
+        buffer = buf,
     })
 end
 
