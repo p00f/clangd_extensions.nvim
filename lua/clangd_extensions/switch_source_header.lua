@@ -14,12 +14,10 @@ local function handler(_err, uri)
     }, {})
 end
 
-local M = {}
-
-function M.switch_source_header()
-    vim.lsp.buf_request(0, "textDocument/switchSourceHeader", {
-        uri = vim.uri_from_bufnr(0),
-    }, handler)
-end
-
-return M
+return {
+    switch_source_header = function()
+        vim.lsp.buf_request(0, "textDocument/switchSourceHeader", {
+            uri = vim.uri_from_bufnr(0),
+        }, handler)
+    end,
+}
