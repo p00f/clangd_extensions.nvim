@@ -21,9 +21,9 @@ local function display(lines)
         col = col,
         border = require("clangd_extensions.config").options.memory_usage.border,
     })
-    vim.bo[buf].shiftwidth = 2
     vim.wo.foldmethod = "indent"
     api.nvim_buf_set_lines(buf, 0, -1, true, lines)
+    api.nvim_set_option_value("shiftwidth", 2, { buf = buf })
     api.nvim_set_option_value("bufhidden", "wipe", { buf = buf })
     api.nvim_set_option_value("modifiable", false, { buf = buf })
     api.nvim_set_option_value("buftype", "nofile", { buf = buf })
