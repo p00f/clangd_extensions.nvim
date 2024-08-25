@@ -100,9 +100,11 @@ local function highlight_detail(ast_buf)
             conf.highlights.detail,
             { linenum - 1, range.start },
             { linenum - 1, range["end"] },
-            "v",
-            false,
-            110
+            {
+                regtype = "v",
+                inclusive = false,
+                priority = 110,
+            }
         )
     end
 end
@@ -157,9 +159,11 @@ function M.update_highlight(source_buf, ast_buf)
             "Search",
             curline_ranges.start,
             curline_ranges["end"],
-            "v",
-            false,
-            110
+            {
+                regtype = "v",
+                inclusive = false,
+                priority = 110,
+            }
         )
     end
 end

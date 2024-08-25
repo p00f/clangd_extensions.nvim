@@ -5,8 +5,8 @@ local function display(lines)
     for k, line in pairs(lines) do -- Pad lines
         if k ~= 1 then lines[k] = "  " .. line .. "  " end
     end
-    local vim_width = api.nvim_get_option("columns")
-    local vim_height = api.nvim_get_option("lines")
+    local vim_width = api.nvim_get_option_value("columns", { scope = "local" })
+    local vim_height = api.nvim_get_option_value("lines", { scope = "local" })
     local height = math.ceil(vim_height * 0.7 - 4)
     local width = math.ceil(vim_width * 0.7)
     local row = math.ceil((vim_height - height) / 2 - 1)
@@ -21,19 +21,21 @@ local function display(lines)
         col = col,
         border = require("clangd_extensions.config").options.memory_usage.border,
     })
-    vim.bo.shiftwidth = 2
     vim.wo.foldmethod = "indent"
     api.nvim_buf_set_lines(buf, 0, -1, true, lines)
+    api.nvim_set_option_value("shiftwidth", 2, { buf = buf })
     api.nvim_set_option_value("bufhidden", "wipe", { buf = buf })
     api.nvim_set_option_value("modifiable", false, { buf = buf })
     api.nvim_set_option_value("buftype", "nofile", { buf = buf })
-    api.nvim_buf_set_keymap(buf, "n", "q", ":bd<CR>", {
+    vim.keymap.set("n", "q", ":bd<CR>", {
         noremap = true,
         silent = true,
+        buffer = buf,
     })
-    api.nvim_buf_set_keymap(buf, "n", "<ESC>", ":bd<CR>", {
+    vim.keymap.set("n", "<ESC>", ":bd<CR>", {
         noremap = true,
         silent = true,
+        buffer = buf,
     })
 end
 

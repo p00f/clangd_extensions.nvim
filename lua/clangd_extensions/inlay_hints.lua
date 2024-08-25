@@ -142,7 +142,7 @@ local function handler(err, result, ctx)
     local max_len = -1
 
     for key, _ in pairs(ret) do
-        local line = tonumber(key)
+        local line = math.floor(tonumber(key))
         local current_line =
             vim.api.nvim_buf_get_lines(bufnr, line, line + 1, false)[1]
         if current_line then
@@ -153,7 +153,7 @@ local function handler(err, result, ctx)
 
     for key, value in pairs(ret) do
         local virt_text = ""
-        local line = tonumber(key)
+        local line = math.floor(tonumber(key))
 
         local current_line =
             vim.api.nvim_buf_get_lines(bufnr, line, line + 1, false)[1]
