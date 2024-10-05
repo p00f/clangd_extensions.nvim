@@ -245,6 +245,9 @@ local function inline_handler(err, result, ctx)
 
     for _, hint in pairs(result) do
         local text = hint.label
+        if (type(text) == "table") then
+            text = text[1].value
+        end
         if hint.paddingLeft then text = " " .. text end
         if hint.paddingRight then text = text .. " " end
         local line = hint.position.line
