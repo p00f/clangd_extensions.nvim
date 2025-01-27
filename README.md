@@ -10,36 +10,6 @@ Set up clangd via lspconfig/vim.lsp.start, as usual.
 You don't need to call `require("clangd_extensions").setup` if you like the defaults:
 ```lua
 require("clangd_extensions").setup({
-    inlay_hints = {
-        inline = vim.fn.has("nvim-0.10") == 1,
-        -- Options other than `highlight' and `priority' only work
-        -- if `inline' is disabled
-        -- Only show inlay hints for the current line
-        only_current_line = false,
-        -- Event which triggers a refresh of the inlay hints.
-        -- You can make this { "CursorMoved" } or { "CursorMoved,CursorMovedI" } but
-        -- note that this may cause higher CPU usage.
-        -- This option is only respected when only_current_line is true.
-        only_current_line_autocmd = { "CursorHold" },
-        -- whether to show parameter hints with the inlay hints or not
-        show_parameter_hints = true,
-        -- prefix for parameter hints
-        parameter_hints_prefix = "<- ",
-        -- prefix for all the other hints (type, chaining)
-        other_hints_prefix = "=> ",
-        -- whether to align to the length of the longest line in the file
-        max_len_align = false,
-        -- padding from the left if max_len_align is true
-        max_len_align_padding = 1,
-        -- whether to align to the extreme right or not
-        right_align = false,
-        -- padding from the right if right_align is true
-        right_align_padding = 7,
-        -- The color of the hints
-        highlight = "Comment",
-        -- The highlight group priority for extmark
-        priority = 100,
-    },
     ast = {
         -- These are unicode, should be available in any font
         role_icons = {
@@ -95,45 +65,6 @@ require("clangd_extensions").setup({
 ### [Switch between source/header](https://clangd.llvm.org/extensions#switch-between-sourceheader)
 ### Usage
 `:ClangdSwitchSourceHeader`
-### [Inlay hints](https://clangd.llvm.org/extensions#inlay-hints)
-![image](https://user-images.githubusercontent.com/36493671/152699601-61ad1640-96bf-4082-b553-75d4085c3496.png)
-#### Usage
-Add this to your nvim-lspconfig / `vim.lsp.start()`'s `on_attach`:
-```lua
-require("clangd_extensions.inlay_hints").setup_autocmd()
-require("clangd_extensions.inlay_hints").set_inlay_hints()
-```
-
-You can also enable, disable or toggle the hints with `ClangdSetInlayHints`, `ClangdDisableInlayHints` and `ClangdToggleInlayHints`.
-Toggling returns the current state of the hints, this is useful if you want to hook a callback when toggling inlay hints:
-```lua
-if require("clangd_extensions.inlay_hints").toggle_inlay_hints() then
-    -- Inlay hints are enabled
-else
-    -- Inlay hints are disabled
-end
-```
-For example if you have autocommands related to Clangd inlay hints you might want to disable/enable them when toggling inlay hints:
-```lua
-on_attach = function(_, buf)
-    local group = vim.api.nvim_create_augroup("clangd_no_inlay_hints_in_insert", { clear = true })
-
-    vim.keymap.set("n", "<leader>lh", function()
-        if require("clangd_extensions.inlay_hints").toggle_inlay_hints() then
-            vim.api.nvim_create_autocmd("InsertEnter", { group = group, buffer = buf,
-                callback = require("clangd_extensions.inlay_hints").disable_inlay_hints
-            })
-            vim.api.nvim_create_autocmd({ "TextChanged", "InsertLeave" }, { group = group, buffer = buf,
-                callback = require("clangd_extensions.inlay_hints").set_inlay_hints
-            })
-        else
-            vim.api.nvim_clear_autocmds({ group = group, buffer = buf })
-        end
-    end, { buffer = buf, desc = "[l]sp [h]ints toggle" })
-end,
-}
-```
-
 ### [View AST](https://clangd.llvm.org/extensions#ast)
 ![image](https://user-images.githubusercontent.com/36493671/255611133-35f397d3-02f8-4d14-b70a-126be6c098fa.gif)
 You can fold nodes using `zc` and friends - the AST window has `shiftwidth=2` and `foldmethod=indent`.
@@ -187,8 +118,6 @@ You can fold items using `zc` and friends - the memory usage window has `shiftwi
 
  ☑️ Type hierarchy
 
- ☑️ Inlay hints
-
  ☑️ Switch between source/header
 
  ☑️ File status (see lsp-status.nvim)
@@ -198,5 +127,3 @@ You can fold items using `zc` and friends - the memory usage window has `shiftwi
  ☑️ Code completion scores
 
  ⬜ Force diagnostics generation (not sure)
-## Credits
-[simrat39](https://github.com/simrat39) - the code for inlay hints was taken from [rust-tools.nvim](https://github.com/simrat39/rust-tools.nvim) with very minor changes.
