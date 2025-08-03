@@ -1,6 +1,11 @@
 local fmt = string.format
+local tbl_contains = vim.tbl_contains
 local api = vim.api
 local conf = require("clangd_extensions.config").options.ast
+
+local nvim_get_current_buf = api.nvim_get_current_buf
+local augroup = api.nvim_create_augroup
+local autocmd = api.nvim_create_autocmd
 
 local M = {}
 --- node_pos[source_buf][ast_buf][linenum] = { start = start, end = end }
@@ -12,13 +17,13 @@ M.detail_pos = {}
 M.nsid = vim.api.nvim_create_namespace("clangd_extensions")
 
 local function setup_hl_autocmd(source_buf, ast_buf)
-    local group = api.nvim_create_augroup("ClangdExtensions", {})
-    api.nvim_create_autocmd("CursorMoved", {
+    local group = augroup("ClangdExtensions", {})
+    autocmd("CursorMoved", {
         group = group,
         buffer = ast_buf,
         callback = function() M.update_highlight(source_buf, ast_buf) end,
     })
-    api.nvim_create_autocmd("BufLeave", {
+    autocmd("BufLeave", {
         group = group,
         buffer = ast_buf,
         callback = function() M.clear_highlight(source_buf) end,
@@ -36,29 +41,32 @@ local function icon_prefix(role, kind)
 end
 
 local function describe(role, kind, detail)
-    local str = ""
     local icon = icon_prefix(role, kind)
     local detailpos = nil
-    str = str .. kind
-    if
-        not (
-            role == "expression"
-            or role == "statement"
-            or role == "declaration"
-            or role == "template name"
-        )
-    then
-        str = str .. " " .. role
+    local role_dismiss = {
+        "expression",
+        "statement",
+        "declaration",
+        "template name",
+    }
+
+    local str = kind
+
+    if not tbl_contains(role_dismiss, role) then
+        str = fmt("%s %s", str, role)
     end
+
+    local str_len = string.len(str)
+    local icon_len = vim.fn.strlen(icon)
+
     if detail then
         detailpos = {
-            start = string.len(str) + vim.fn.strlen(icon) + 1,
-            ["end"] = string.len(str) + vim.fn.strlen(icon) + string.len(
-                detail
-            ) + 1,
+            start = str_len + icon_len + 1,
+            ["end"] = str_len + icon_len + string.len(detail) + 1,
         }
-        str = str .. " " .. detail
+        str = fmt("%s %s", str, detail)
     end
+
     return (icon .. str), detailpos
 end
 
@@ -67,15 +75,18 @@ local function walk_tree(node, visited, result, padding, hl_bufs)
     local str, detpos = describe(node.role, node.kind, node.detail)
     table.insert(result, padding .. str)
 
+    local len = string.len(padding)
+    local result_len = #result
+
     if node.detail and detpos then
-        M.detail_pos[hl_bufs.ast_buf][#result] = {
-            start = string.len(padding) + detpos.start,
-            ["end"] = string.len(padding) + detpos["end"],
+        M.detail_pos[hl_bufs.ast_buf][result_len] = {
+            start = len + detpos.start,
+            ["end"] = len + detpos["end"],
         }
     end
 
     if node.range then
-        M.node_pos[hl_bufs.source_buf][hl_bufs.ast_buf][#result] = {
+        M.node_pos[hl_bufs.source_buf][hl_bufs.ast_buf][result_len] = {
             start = { node.range.start.line, node.range.start.character },
             ["end"] = { node.range["end"].line, node.range["end"].character },
         }
@@ -110,37 +121,37 @@ local function highlight_detail(ast_buf)
 end
 
 local function handler(err, ASTNode)
-    if err or not ASTNode then
-        return
-    else
-        local source_buf = api.nvim_get_current_buf()
-        vim.cmd.vsplit(fmt("%s: AST", ASTNode.detail))
-        local ast_buf = api.nvim_get_current_buf()
-        api.nvim_set_option_value("filetype", "ClangdAST", { buf = ast_buf })
-        if not M.node_pos[source_buf] then M.node_pos[source_buf] = {} end
-        M.node_pos[source_buf][ast_buf] = {}
-        M.detail_pos[ast_buf] = {}
+    if err or not ASTNode then return end
 
-        local lines = walk_tree(
-            ASTNode,
-            {},
-            {},
-            "",
-            { source_buf = source_buf, ast_buf = ast_buf }
-        )
-        api.nvim_buf_set_lines(ast_buf, 0, -1, true, lines)
-        vim.bo.buftype = "nofile"
-        vim.bo.bufhidden = "wipe"
-        vim.bo.modifiable = false
-        vim.bo.shiftwidth = 2
-        vim.wo.foldmethod = "indent"
-        api.nvim_set_option_value("number", false, { scope = "local" })
-        api.nvim_set_option_value("relativenumber", false, { scope = "local" })
-        api.nvim_set_option_value("spell", false, { scope = "local" })
-        api.nvim_set_option_value("cursorline", false, { scope = "local" })
-        setup_hl_autocmd(source_buf, ast_buf)
-        highlight_detail(ast_buf)
-    end
+    local source_buf = nvim_get_current_buf()
+    vim.cmd.vsplit(fmt("%s: AST", ASTNode.detail))
+    local ast_buf = nvim_get_current_buf()
+    api.nvim_set_option_value("filetype", "ClangdAST", { buf = ast_buf })
+
+    if not M.node_pos[source_buf] then M.node_pos[source_buf] = {} end
+
+    M.node_pos[source_buf][ast_buf] = {}
+    M.detail_pos[ast_buf] = {}
+
+    local lines = walk_tree(
+        ASTNode,
+        {},
+        {},
+        "",
+        { source_buf = source_buf, ast_buf = ast_buf }
+    )
+    api.nvim_buf_set_lines(ast_buf, 0, -1, true, lines)
+    vim.bo.buftype = "nofile"
+    vim.bo.bufhidden = "wipe"
+    vim.bo.modifiable = false
+    vim.bo.shiftwidth = 2
+    vim.wo.foldmethod = "indent"
+    api.nvim_set_option_value("number", false, { scope = "local" })
+    api.nvim_set_option_value("relativenumber", false, { scope = "local" })
+    api.nvim_set_option_value("spell", false, { scope = "local" })
+    api.nvim_set_option_value("cursorline", false, { scope = "local" })
+    setup_hl_autocmd(source_buf, ast_buf)
+    highlight_detail(ast_buf)
 end
 
 function M.clear_highlight(source_buf)
@@ -149,7 +160,9 @@ end
 
 function M.update_highlight(source_buf, ast_buf)
     M.clear_highlight(source_buf)
-    if api.nvim_get_current_buf() ~= ast_buf then return end
+
+    if nvim_get_current_buf() ~= ast_buf then return end
+
     local curline = vim.fn.getcurpos()[2]
     local curline_ranges = M.node_pos[source_buf][ast_buf][curline]
     if curline_ranges then
@@ -169,8 +182,10 @@ function M.update_highlight(source_buf, ast_buf)
 end
 
 function M.display_ast(line1, line2)
-    vim.lsp.buf_request(0, "textDocument/ast", {
-        textDocument = { uri = vim.uri_from_bufnr(0) },
+    local bufnr = nvim_get_current_buf()
+
+    require("clangd_extensions.utils").buf_request_method("textDocument/ast", {
+        textDocument = { uri = vim.uri_from_bufnr(bufnr) },
         range = {
             start = {
                 line = line1 - 1,
@@ -181,7 +196,7 @@ function M.display_ast(line1, line2)
                 character = 0,
             },
         },
-    }, handler)
+    }, handler, bufnr)
 end
 
 return M

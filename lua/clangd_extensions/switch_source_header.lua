@@ -1,3 +1,6 @@
+local api = vim.api
+local nvim_get_current_buf = api.nvim_get_current_buf
+
 local function handler(_err, uri)
     if not uri or uri == "" then
         vim.api.nvim_echo(
@@ -14,10 +17,18 @@ local function handler(_err, uri)
     }, {})
 end
 
-return {
-    switch_source_header = function()
-        vim.lsp.buf_request(0, "textDocument/switchSourceHeader", {
-            uri = vim.uri_from_bufnr(0),
-        }, handler)
-    end,
-}
+local M = {}
+
+function M.switch_source_header()
+    local bufnr = nvim_get_current_buf()
+    require("clangd_extensions.utils").buf_request_method(
+        "textDocument/switchSourceHeader",
+        {
+            uri = vim.uri_from_bufnr(bufnr),
+        },
+        handler,
+        bufnr
+    )
+end
+
+return M
