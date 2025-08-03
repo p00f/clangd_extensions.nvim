@@ -1,5 +1,5 @@
-return {
-    setup = function(options)
-        require("clangd_extensions.config").setup(options)
-    end,
-}
+local M = {}
+
+M.setup = require("clangd_extensions.config").setup
+
+return M

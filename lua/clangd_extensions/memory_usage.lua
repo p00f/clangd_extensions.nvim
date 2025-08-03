@@ -1,5 +1,7 @@
 local api = vim.api
+local nvim_get_current_buf = api.nvim_get_current_buf
 local fmt = string.format
+local ceil = math.ceil
 
 local function display(lines)
     for k, line in pairs(lines) do -- Pad lines
@@ -7,10 +9,10 @@ local function display(lines)
     end
     local vim_width = api.nvim_get_option_value("columns", { scope = "local" })
     local vim_height = api.nvim_get_option_value("lines", { scope = "local" })
-    local height = math.ceil(vim_height * 0.7 - 4)
-    local width = math.ceil(vim_width * 0.7)
-    local row = math.ceil((vim_height - height) / 2 - 1)
-    local col = math.ceil((vim_width - width) / 2)
+    local height = ceil(vim_height * 0.7 - 4)
+    local width = ceil(vim_width * 0.7)
+    local row = ceil((vim_height - height) / 2 - 1)
+    local col = ceil((vim_width - width) / 2)
     local buf = api.nvim_create_buf(false, true)
     api.nvim_open_win(buf, true, {
         style = "minimal",
@@ -103,11 +105,11 @@ end
 local M = {}
 
 function M.show_memory_usage(expand_preamble)
-    vim.lsp.buf_request(
-        0,
+    require("clangd_extensions.utils").buf_request_method(
         "$/memoryUsage",
         nil,
-        function(err, result) handler(err, result, expand_preamble) end
+        function(err, result) handler(err, result, expand_preamble) end,
+        nvim_get_current_buf()
     )
 end
 
