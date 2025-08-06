@@ -1,0 +1,9 @@
+repos:
+  - repo: local
+    hooks:
+      - id: stylua
+        name: StyLua
+        language: system
+        entry: stylua
+        types: [lua]
+        verbose: true
