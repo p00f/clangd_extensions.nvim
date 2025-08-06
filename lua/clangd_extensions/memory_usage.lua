@@ -1,10 +1,16 @@
 local api = vim.api
 local nvim_get_current_buf = api.nvim_get_current_buf
-local fmt = string.format
 local ceil = math.ceil
 
+---@class Clangd.MemoryTreeSpec
+---@field _total number
+---@field _self number
+
+---@alias Clangd.MemoryTree table<string, Clangd.MemoryTreeSpec>|Clangd.MemoryTreeSpec
+
+---@param lines string[]
 local function display(lines)
-    for k, line in pairs(lines) do -- Pad lines
+    for k, line in ipairs(lines) do -- Pad lines
         if k ~= 1 then lines[k] = "  " .. line .. "  " end
     end
     local vim_width = api.nvim_get_option_value("columns", { scope = "local" })
@@ -41,15 +47,22 @@ local function display(lines)
     })
 end
 
+---@param name string
+---@return string name
 local function format_name(name)
     if name:sub(1, 7) == "file://" then name = vim.uri_to_fname(name) end
     local cwd = vim.fn.getcwd()
-    if name:sub(1, string.len(cwd)) == cwd then
-        name = name:sub(string.len(cwd) + 2, -1)
-    end
+    if name:sub(1, cwd:len()) == cwd then name = name:sub(cwd:len() + 2, -1) end
     return name
 end
 
+---@param node Clangd.MemoryTree
+---@param visited table
+---@param result table
+---@param padding string
+---@param prefix string
+---@param expand_preamble boolean
+---@return table result
 local function format_tree(
     node,
     visited,
@@ -61,7 +74,7 @@ local function format_tree(
     if padding == "" then
         table.insert(
             result,
-            fmt("Total: self = %s, total = %s", node._self, node._total)
+            ("Total: self = %s, total = %s"):format(node._self, node._total)
         )
     end
     visited[prefix] = true
@@ -74,13 +87,12 @@ local function format_tree(
             child_name = format_name(child_name)
             table.insert(
                 result,
-                padding
-                    .. fmt(
-                        "%s: self = %s, total = %s",
-                        child_name,
-                        child_node._self,
-                        child_node._total
-                    )
+                ("%s%s: self = %s, total = %s"):format(
+                    padding,
+                    child_name,
+                    child_node._self,
+                    child_node._total
+                )
             )
             if child_name ~= "preamble" or expand_preamble then
                 format_tree(
@@ -97,13 +109,18 @@ local function format_tree(
     return result
 end
 
+---@param err? lsp.ResponseError
+---@param result? Clangd.MemoryTree
+---@param expand_preamble boolean
 local function handler(err, result, expand_preamble)
-    if err then return end
+    if err or not result then return end
     display(format_tree(result, {}, { "" }, "", "", expand_preamble))
 end
 
+---@class ClangdExt.MemUsage
 local M = {}
 
+---@param expand_preamble boolean
 function M.show_memory_usage(expand_preamble)
     require("clangd_extensions.utils").buf_request_method(
         "$/memoryUsage",
@@ -114,3 +131,4 @@ function M.show_memory_usage(expand_preamble)
 end
 
 return M
+-- vim: set ts=4 sts=4 sw=4 et ai si sta:

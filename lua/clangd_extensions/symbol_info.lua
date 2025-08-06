@@ -1,22 +1,24 @@
-local fmt = string.format
-local len = string.len
 local api = vim.api
 local nvim_get_current_buf = api.nvim_get_current_buf
 
+---@param err? lsp.ResponseError
+---@param result? Clangd.SymbolDetails[]
 local function handler(err, result)
-    if err or (#result == 0) then return end
-    local name_str = fmt("name: %s", result[1].name)
-    local container_str = fmt("container: %s", result[1].containerName)
+    if err or not result or not result[1] then return end
+
+    local name_str = ("name: %s"):format(result[1].name)
+    local container_str = ("container: %s"):format(result[1].containerName)
 
     vim.lsp.util.open_floating_preview({ name_str, container_str }, "", {
         height = 2,
-        width = math.max(len(name_str), len(container_str)),
+        width = math.max(name_str:len(), container_str:len()),
         focusable = false,
         focus = false,
         border = require("clangd_extensions.config").options.symbol_info.border,
     })
 end
 
+---@class ClangdExt.SymbolInfo
 local M = {}
 
 function M.show_symbol_info()
@@ -39,3 +41,4 @@ function M.show_symbol_info()
 end
 
 return M
+-- vim: set ts=4 sts=4 sw=4 et ai si sta:

@@ -1,5 +1,7 @@
+---@class ClangdExt.Config
 local M = {}
 
+---@class ClangdExt.Opts
 M.options = {
     ast = {
         role_icons = {
@@ -35,8 +37,10 @@ M.options = {
     },
 }
 
+---@param options? ClangdExt.Opts
 function M.setup(options)
     M.options = vim.tbl_deep_extend("force", {}, M.options, options or {})
 end
 
 return M
+-- vim: set ts=4 sts=4 sw=4 et ai si sta:

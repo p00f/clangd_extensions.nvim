@@ -1,19 +1,25 @@
 local symbol_kind = require("clangd_extensions.symbol_kind")
-local fmt = string.format
 local api = vim.api
 local nvim_get_current_buf = api.nvim_get_current_buf
 local type_hierarchy_augroup =
     api.nvim_create_augroup("ClangdTypeHierarchy", {})
 
+---@class ClangdExt.TypeHierarchy
 local M = {}
 M.type_to_location = {}
 M.offset_encoding = {}
 
+---@param node Clangd.TypeHierarchyItem
+---@param visited table|unknown
+---@param result table|unknown
+---@param padding string
+---@param type_to_location table
+---@return table|unknown result
 local function format_tree(node, visited, result, padding, type_to_location)
     visited[node.data] = true
     table.insert(
         result,
-        padding .. fmt(" • %s: %s", node.name, symbol_kind[node.kind])
+        padding .. (" • %s: %s"):format(node.name, symbol_kind[node.kind])
     )
 
     type_to_location[node.name] = { uri = node.uri, range = node.range }
@@ -33,19 +39,17 @@ local function format_tree(node, visited, result, padding, type_to_location)
         end
     end
 
-    if node.children then
-        if #node.children > 0 then
-            table.insert(result, padding .. "   Children:")
-            for _, child in pairs(node.children) do
-                if not visited[child.data] then
-                    format_tree(
-                        child,
-                        visited,
-                        result,
-                        padding .. "   ",
-                        type_to_location
-                    )
-                end
+    if node.children and #node.children > 0 then
+        table.insert(result, padding .. "   Children:")
+        for _, child in pairs(node.children) do
+            if not visited[child.data] then
+                format_tree(
+                    child,
+                    visited,
+                    result,
+                    padding .. "   ",
+                    type_to_location
+                )
             end
         end
     end
@@ -53,22 +57,26 @@ local function format_tree(node, visited, result, padding, type_to_location)
     return result
 end
 
-local function handler(err, TypeHierarchyItem, ctx)
-    if err or not TypeHierarchyItem then return end
+---@param err? lsp.ResponseError
+---@param result? Clangd.TypeHierarchyItem
+---@param ctx lsp.HandlerContext
+local function handler(err, result, ctx)
+    if err or not result then return end
 
     local client_id = ctx.client_id
     -- Save old state
     local source_win = api.nvim_get_current_win()
 
     -- Init
-    M.offset_encoding[client_id] = vim.lsp.get_clients({ id = client_id })[1].offset_encoding
-    vim.cmd.split(fmt("%s: type hierarchy", TypeHierarchyItem.name))
+    M.offset_encoding[client_id] =
+        vim.lsp.get_clients({ id = client_id })[1].offset_encoding
+    vim.cmd.split(("%s: type hierarchy"):format(result.name))
     local bufnr = nvim_get_current_buf()
     M.type_to_location[bufnr] = {}
 
     -- Set content
     local lines = format_tree(
-        TypeHierarchyItem,
+        result,
         {},
         {},
         "",
@@ -101,7 +109,7 @@ local function handler(err, TypeHierarchyItem, ctx)
     -- Set keymap
     vim.keymap.set("n", "gd", function()
         local word = vim.fn.expand("<cWORD>")
-        word = string.gsub(word, ":$", "")
+        word = word:gsub(":$", "")
         local location = M.type_to_location[bufnr][word]
         if location ~= nil then
             api.nvim_set_current_win(source_win)
@@ -138,7 +146,7 @@ function M.show_hierarchy()
                 line = vim.fn.getcurpos()[2] - 1,
                 character = vim.fn.getcurpos()[3] - 1,
             },
-            -- TODO make these configurable (config + command args)
+            -- TODO: make these configurable (config + command args)
             resolve = 3,
             direction = 2,
         },
@@ -148,3 +156,4 @@ function M.show_hierarchy()
 end
 
 return M
+-- vim: set ts=4 sts=4 sw=4 et ai si sta:

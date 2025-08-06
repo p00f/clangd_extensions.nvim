@@ -1,3 +1,4 @@
+---@class ClangdExt.SymbolKind
 return {
     "File",
     "Module",
@@ -26,3 +27,4 @@ return {
     "Operator",
     "TypeParameter",
 }
+-- vim: set ts=4 sts=4 sw=4 et ai si sta:

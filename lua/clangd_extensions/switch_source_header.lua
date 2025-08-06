@@ -1,8 +1,10 @@
 local api = vim.api
 local nvim_get_current_buf = api.nvim_get_current_buf
 
-local function handler(_err, uri)
-    if not uri or uri == "" then
+---@param err? lsp.ResponseError
+---@param uri? string
+local function handler(err, uri)
+    if err or not uri or (uri == "") then
         vim.api.nvim_echo(
             { { "Corresponding file cannot be determined" } },
             false,
@@ -17,6 +19,7 @@ local function handler(_err, uri)
     }, {})
 end
 
+---@class ClangdExt.SwitchSourceHeader
 local M = {}
 
 function M.switch_source_header()
@@ -32,3 +35,4 @@ function M.switch_source_header()
 end
 
 return M
+-- vim: set ts=4 sts=4 sw=4 et ai si sta:

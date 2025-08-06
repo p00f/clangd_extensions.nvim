@@ -1,0 +1,215 @@
+---@class lsp.Position
+---@field line number
+---@field character number
+
+---@class lsp.Range
+---@field start lsp.Position
+---@field end lsp.Position
+
+---@class lsp.ResponseError
+---@field code number
+---@field message string
+---@field data? any
+
+---@class lsp.SymbolKind alias number
+
+--- @alias vim.lsp.protocol.Method.ClientToServer.Request
+--- | 'callHierarchy/incomingCalls',
+--- | 'callHierarchy/outgoingCalls',
+--- | 'codeAction/resolve',
+--- | 'codeLens/resolve',
+--- | 'completionItem/resolve',
+--- | 'documentLink/resolve',
+--- | 'initialize',
+--- | 'inlayHint/resolve',
+--- | 'shutdown',
+--- | 'textDocument/codeAction',
+--- | 'textDocument/codeLens',
+--- | 'textDocument/colorPresentation',
+--- | 'textDocument/completion',
+--- | 'textDocument/declaration',
+--- | 'textDocument/definition',
+--- | 'textDocument/diagnostic',
+--- | 'textDocument/documentColor',
+--- | 'textDocument/documentHighlight',
+--- | 'textDocument/documentLink',
+--- | 'textDocument/documentSymbol',
+--- | 'textDocument/foldingRange',
+--- | 'textDocument/formatting',
+--- | 'textDocument/hover',
+--- | 'textDocument/implementation',
+--- | 'textDocument/inlayHint',
+--- | 'textDocument/inlineCompletion',
+--- | 'textDocument/inlineValue',
+--- | 'textDocument/linkedEditingRange',
+--- | 'textDocument/moniker',
+--- | 'textDocument/onTypeFormatting',
+--- | 'textDocument/prepareCallHierarchy',
+--- | 'textDocument/prepareRename',
+--- | 'textDocument/prepareTypeHierarchy',
+--- | 'textDocument/rangeFormatting',
+--- | 'textDocument/rangesFormatting',
+--- | 'textDocument/references',
+--- | 'textDocument/rename',
+--- | 'textDocument/selectionRange',
+--- | 'textDocument/semanticTokens/full',
+--- | 'textDocument/semanticTokens/full/delta',
+--- | 'textDocument/semanticTokens/range',
+--- | 'textDocument/signatureHelp',
+--- | 'textDocument/typeDefinition',
+--- | 'textDocument/willSaveWaitUntil',
+--- | 'typeHierarchy/subtypes',
+--- | 'typeHierarchy/supertypes',
+--- | 'workspaceSymbol/resolve',
+--- | 'workspace/diagnostic',
+--- | 'workspace/executeCommand',
+--- | 'workspace/symbol',
+--- | 'workspace/textDocumentContent',
+--- | 'workspace/willCreateFiles',
+--- | 'workspace/willDeleteFiles',
+--- | 'workspace/willRenameFiles',
+
+--- LSP Notification (direction: clientToServer)
+--- @alias vim.lsp.protocol.Method.ClientToServer.Notification
+--- | '$/cancelRequest',
+--- | '$/progress',
+--- | '$/setTrace',
+--- | 'exit',
+--- | 'initialized',
+--- | 'notebookDocument/didChange',
+--- | 'notebookDocument/didClose',
+--- | 'notebookDocument/didOpen',
+--- | 'notebookDocument/didSave',
+--- | 'textDocument/didChange',
+--- | 'textDocument/didClose',
+--- | 'textDocument/didOpen',
+--- | 'textDocument/didSave',
+--- | 'textDocument/willSave',
+--- | 'window/workDoneProgress/cancel',
+--- | 'workspace/didChangeConfiguration',
+--- | 'workspace/didChangeWatchedFiles',
+--- | 'workspace/didChangeWorkspaceFolders',
+--- | 'workspace/didCreateFiles',
+--- | 'workspace/didDeleteFiles',
+--- | 'workspace/didRenameFiles',
+
+--- LSP Request (direction: serverToClient)
+--- @alias vim.lsp.protocol.Method.ServerToClient.Request
+--- | 'client/registerCapability',
+--- | 'client/unregisterCapability',
+--- | 'window/showDocument',
+--- | 'window/showMessageRequest',
+--- | 'window/workDoneProgress/create',
+--- | 'workspace/applyEdit',
+--- | 'workspace/codeLens/refresh',
+--- | 'workspace/configuration',
+--- | 'workspace/diagnostic/refresh',
+--- | 'workspace/foldingRange/refresh',
+--- | 'workspace/inlayHint/refresh',
+--- | 'workspace/inlineValue/refresh',
+--- | 'workspace/semanticTokens/refresh',
+--- | 'workspace/textDocumentContent/refresh',
+--- | 'workspace/workspaceFolders',
+
+--- LSP Notification (direction: serverToClient)
+--- @alias vim.lsp.protocol.Method.ServerToClient.Notification
+--- | '$/cancelRequest',
+--- | '$/logTrace',
+--- | '$/progress',
+--- | 'telemetry/event',
+--- | 'textDocument/publishDiagnostics',
+--- | 'window/logMessage',
+--- | 'window/showMessage',
+
+--- @alias vim.lsp.protocol.Method.ClientToServer
+--- | vim.lsp.protocol.Method.ClientToServer.Request
+--- | vim.lsp.protocol.Method.ClientToServer.Notification
+
+--- @alias vim.lsp.protocol.Method.ServerToClient
+--- | vim.lsp.protocol.Method.ServerToClient.Request
+--- | vim.lsp.protocol.Method.ServerToClient.Notification
+
+--- @alias vim.lsp.protocol.Method
+--- | vim.lsp.protocol.Method.ClientToServer
+--- | vim.lsp.protocol.Method.ServerToClient
+
+---@class lsp.HandlerContext
+---@field method vim.lsp.protocol.Method
+---@field client_id integer
+---@field bufnr? integer
+---@field params? any
+---@field version? integer
+
+---@alias lsp.Handler fun(err: lsp.ResponseError?, result: any, context: lsp.HandlerContext, config?: table): ...any
+
+---@class lsp.CompletionItem
+---@field label string
+---@field labelDetails? lsp.CompletionItemLabelDetails
+---@field kind? lsp.CompletionItemKind
+---@field tags? lsp.CompletionItemTag[]
+---@field detail? string
+---@field documentation? string|lsp.MarkupContent
+---@field deprecated? boolean
+---@field preselect? boolean
+---@field sortText? string
+---@field filterText? string
+---@field insertText? string
+---@field insertTextFormat? lsp.InsertTextFormat
+---@field insertTextMode? lsp.InsertTextMode
+---@field textEdit? lsp.TextEdit | lsp.InsertReplaceEdit
+---@field textEditText? string
+---@field additionalTextEdits? lsp.TextEdit[]
+---@field commitCharacters? string[]
+---@field command? lsp.Command
+---@field data? any
+
+---@class Clangd.ASTNode
+---@field role string
+---@field kind string
+---@field detail? string
+---@field arcana? string
+---@field range? lsp.Range
+---@field children? Clangd.ASTNode[]
+
+---@class Clangd.SymbolDetails
+---@field name string
+---@field containerName string
+---@field usr string
+---@field id string?
+
+---@class Clangd.TypeHierarchyItem
+---@field name string
+---@field detail? string
+---@field kind lsp.SymbolKind
+---@field deprecated? boolean
+---@field uri string
+---@field range lsp.Range
+---@field selectionRange lsp.Range
+---@field parents? Clangd.TypeHierarchyItem[]
+---@field children? Clangd.TypeHierarchyItem[]
+---@field data? any
+
+---@class cmp.Entry
+---@field public id integer
+---@field public cache cmp.Cache
+---@field public match_cache cmp.Cache
+---@field public score integer
+---@field public exact boolean
+---@field public matches table
+---@field public context cmp.Context
+---@field public source cmp.Source
+---@field public source_offset integer
+---@field public source_insert_range lsp.Range
+---@field public source_replace_range lsp.Range
+---@field public completion_item lsp.CompletionItem
+---@field public item_defaults? lsp.internal.CompletionItemDefaults
+---@field public resolved_completion_item lsp.CompletionItem|nil
+---@field public resolved_callbacks fun()[]
+---@field public resolving boolean
+---@field public confirmed boolean
+---@field public insert_range lsp.Range
+---@field public replace_range lsp.Range
+---@field public offset integer
+---@field public word string
+---@field public filter_text string
+---@field private match_view_args_ret {input:string, word:string, option:cmp.MatchingConfig, matches:table[]}
