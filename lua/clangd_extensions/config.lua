@@ -1,4 +1,4 @@
----@class ClangdCfg
+---@class ClangdConfig
 local M = {}
 
 ---@class ClangdOpts

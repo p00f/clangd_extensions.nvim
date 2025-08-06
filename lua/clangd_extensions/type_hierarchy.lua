@@ -10,11 +10,11 @@ local M = {}
 M.type_to_location = {}
 M.offset_encoding = {}
 
----@param node any
+---@param node table
 ---@param visited table|unknown
 ---@param result table|unknown
 ---@param padding string
----@param type_to_location unknown
+---@param type_to_location table
 ---@return table|unknown result
 local function format_tree(node, visited, result, padding, type_to_location)
     visited[node.data] = true

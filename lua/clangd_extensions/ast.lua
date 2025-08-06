@@ -38,7 +38,7 @@ end
 
 ---@param role string
 ---@param kind string
----@return string
+---@return string|"   "
 local function icon_prefix(role, kind)
     if conf.kind_icons[kind] then return conf.kind_icons[kind] .. "  " end
 
@@ -82,11 +82,11 @@ local function describe(role, kind, detail)
     return (icon .. str), detailpos
 end
 
----@param node any
+---@param node table
 ---@param visited table
 ---@param result table
 ---@param padding string
----@param hl_bufs table|unknown
+---@param hl_bufs table
 ---@return table result
 local function walk_tree(node, visited, result, padding, hl_bufs)
     visited[node] = true
@@ -139,6 +139,8 @@ local function highlight_detail(ast_buf)
     end
 end
 
+---@param err lsp.ResponseError
+---@param ASTNode table
 local function handler(err, ASTNode)
     if err or not ASTNode then return end
 
@@ -178,6 +180,8 @@ function M.clear_highlight(source_buf)
     api.nvim_buf_clear_namespace(source_buf, M.nsid, 0, -1)
 end
 
+---@param source_buf integer
+---@param ast_buf integer
 function M.update_highlight(source_buf, ast_buf)
     M.clear_highlight(source_buf)
 

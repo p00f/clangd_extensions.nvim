@@ -3,9 +3,11 @@ local len = string.len
 local api = vim.api
 local nvim_get_current_buf = api.nvim_get_current_buf
 
----@type lsp.Handler
+---@param err lsp.ResponseError
+---@param result table
 local function handler(err, result)
-    if err or (#result == 0) then return end
+    if err or vim.tbl_isempty(result) then return end
+
     local name_str = fmt("name: %s", result[1].name)
     local container_str = fmt("container: %s", result[1].containerName)
 

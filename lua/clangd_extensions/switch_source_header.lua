@@ -1,7 +1,8 @@
 local api = vim.api
 local nvim_get_current_buf = api.nvim_get_current_buf
 
----@type lsp.Handler
+---@param _err lsp.ResponseError
+---@param uri string
 local function handler(_err, uri)
     if not uri or uri == "" then
         vim.api.nvim_echo(

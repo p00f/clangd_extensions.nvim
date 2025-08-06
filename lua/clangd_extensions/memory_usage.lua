@@ -53,14 +53,13 @@ local function format_name(name)
     return name
 end
 
----comment
----@param node any
+---@param node table
 ---@param visited table
----@param result table|unknown
+---@param result table
 ---@param padding string
 ---@param prefix string
----@param expand_preamble unknown
----@return unknown result
+---@param expand_preamble boolean
+---@return table result
 local function format_tree(
     node,
     visited,
@@ -108,7 +107,9 @@ local function format_tree(
     return result
 end
 
----@type lsp.Handler
+---@param err lsp.ResponseError
+---@param result any
+---@param expand_preamble boolean
 local function handler(err, result, expand_preamble)
     if err then return end
     display(format_tree(result, {}, { "" }, "", "", expand_preamble))
@@ -117,7 +118,7 @@ end
 ---@class ClangdMemUsage
 local M = {}
 
----@param expand_preamble unknown
+---@param expand_preamble boolean
 function M.show_memory_usage(expand_preamble)
     require("clangd_extensions.utils").buf_request_method(
         "$/memoryUsage",

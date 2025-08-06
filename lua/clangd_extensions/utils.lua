@@ -3,7 +3,7 @@ local M = {}
 
 ---@param method vim.lsp.protocol.Method
 ---@param params table|nil
----@param handler lsp.Handler
+---@param handler lsp.Handler|fun(...: any): (...: unknown)
 ---@param bufnr integer
 function M.buf_request_method(method, params, handler, bufnr)
     local clients = vim.lsp.get_clients({ bufnr = bufnr, method = method })
