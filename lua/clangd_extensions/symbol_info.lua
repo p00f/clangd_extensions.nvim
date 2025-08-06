@@ -3,6 +3,7 @@ local len = string.len
 local api = vim.api
 local nvim_get_current_buf = api.nvim_get_current_buf
 
+---@type lsp.Handler
 local function handler(err, result)
     if err or (#result == 0) then return end
     local name_str = fmt("name: %s", result[1].name)
@@ -17,6 +18,7 @@ local function handler(err, result)
     })
 end
 
+---@class ClangdSymbolInfo
 local M = {}
 
 function M.show_symbol_info()

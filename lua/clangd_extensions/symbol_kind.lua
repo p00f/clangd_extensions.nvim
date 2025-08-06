@@ -1,3 +1,4 @@
+---@class ClangdSymbolKind
 return {
     "File",
     "Module",

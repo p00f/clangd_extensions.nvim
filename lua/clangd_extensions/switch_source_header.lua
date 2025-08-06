@@ -1,6 +1,7 @@
 local api = vim.api
 local nvim_get_current_buf = api.nvim_get_current_buf
 
+---@type lsp.Handler
 local function handler(_err, uri)
     if not uri or uri == "" then
         vim.api.nvim_echo(
@@ -17,6 +18,7 @@ local function handler(_err, uri)
     }, {})
 end
 
+---@class ClangdSwitchSourceHeader
 local M = {}
 
 function M.switch_source_header()

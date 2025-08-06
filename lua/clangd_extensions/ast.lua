@@ -7,15 +7,21 @@ local nvim_get_current_buf = api.nvim_get_current_buf
 local augroup = api.nvim_create_augroup
 local autocmd = api.nvim_create_autocmd
 
+---@class ClangdAST
 local M = {}
+
 --- node_pos[source_buf][ast_buf][linenum] = { start = start, end = end }
 --- position of node in `source_buf` corresponding to line no. `linenum` in `ast_buf`
 M.node_pos = {}
+
 --- detail_pos[ast_buf][linenum] = { start = start, end = end }
 --- position of `detail` in line no. `linenum` of `ast_buf`
 M.detail_pos = {}
+
 M.nsid = vim.api.nvim_create_namespace("clangd_extensions")
 
+---@param source_buf integer
+---@param ast_buf integer
 local function setup_hl_autocmd(source_buf, ast_buf)
     local group = augroup("ClangdExtensions", {})
     autocmd("CursorMoved", {
@@ -30,16 +36,22 @@ local function setup_hl_autocmd(source_buf, ast_buf)
     })
 end
 
+---@param role string
+---@param kind string
+---@return string
 local function icon_prefix(role, kind)
-    if conf.kind_icons[kind] then
-        return conf.kind_icons[kind] .. "  "
-    elseif conf.role_icons[role] then
-        return conf.role_icons[role] .. "  "
-    else
-        return "   "
-    end
+    if conf.kind_icons[kind] then return conf.kind_icons[kind] .. "  " end
+
+    if conf.role_icons[role] then return conf.role_icons[role] .. "  " end
+
+    return "   "
 end
 
+---@param role string
+---@param kind string
+---@param detail? string
+---@return string
+---@return table|nil
 local function describe(role, kind, detail)
     local icon = icon_prefix(role, kind)
     local detailpos = nil
@@ -70,6 +82,12 @@ local function describe(role, kind, detail)
     return (icon .. str), detailpos
 end
 
+---@param node any
+---@param visited table
+---@param result table
+---@param padding string
+---@param hl_bufs table|unknown
+---@return table result
 local function walk_tree(node, visited, result, padding, hl_bufs)
     visited[node] = true
     local str, detpos = describe(node.role, node.kind, node.detail)
@@ -103,6 +121,7 @@ local function walk_tree(node, visited, result, padding, hl_bufs)
     return result
 end
 
+---@param ast_buf integer
 local function highlight_detail(ast_buf)
     for linenum, range in pairs(M.detail_pos[ast_buf]) do
         vim.highlight.range(
@@ -154,6 +173,7 @@ local function handler(err, ASTNode)
     highlight_detail(ast_buf)
 end
 
+---@param source_buf integer
 function M.clear_highlight(source_buf)
     api.nvim_buf_clear_namespace(source_buf, M.nsid, 0, -1)
 end
@@ -181,6 +201,8 @@ function M.update_highlight(source_buf, ast_buf)
     end
 end
 
+---@param line1 integer
+---@param line2 integer
 function M.display_ast(line1, line2)
     local bufnr = nvim_get_current_buf()
 

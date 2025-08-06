@@ -1,5 +1,7 @@
+---@class ClangdCfg
 local M = {}
 
+---@class ClangdOpts
 M.options = {
     ast = {
         role_icons = {
@@ -35,6 +37,7 @@ M.options = {
     },
 }
 
+---@param options? table|ClangdOpts
 function M.setup(options)
     M.options = vim.tbl_deep_extend("force", {}, M.options, options or {})
 end
