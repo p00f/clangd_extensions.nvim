@@ -1,10 +1,10 @@
 local api = vim.api
 local nvim_get_current_buf = api.nvim_get_current_buf
 
----@param _err lsp.ResponseError
+---@param err lsp.ResponseError
 ---@param uri string
-local function handler(_err, uri)
     if not uri or uri == "" then
+local function handler(err, uri)
         vim.api.nvim_echo(
             { { "Corresponding file cannot be determined" } },
             false,

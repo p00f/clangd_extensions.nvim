@@ -37,7 +37,7 @@ M.options = {
     },
 }
 
----@param options? table|ClangdOpts
+---@param options? ClangdOpts
 function M.setup(options)
     M.options = vim.tbl_deep_extend("force", {}, M.options, options or {})
 end
