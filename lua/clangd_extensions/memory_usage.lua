@@ -3,6 +3,12 @@ local nvim_get_current_buf = api.nvim_get_current_buf
 local fmt = string.format
 local ceil = math.ceil
 
+---@class MemoryUsageSpec
+---@field _total number
+---@field _self number
+
+---@alias lsp.MemoryUsage table<string, MemoryUsageSpec>|MemoryUsageSpec
+
 ---@param lines string[]
 local function display(lines)
     for k, line in pairs(lines) do -- Pad lines
@@ -53,7 +59,7 @@ local function format_name(name)
     return name
 end
 
----@param node table
+---@param node lsp.MemoryUsage
 ---@param visited table
 ---@param result table
 ---@param padding string

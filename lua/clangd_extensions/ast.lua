@@ -7,6 +7,14 @@ local nvim_get_current_buf = api.nvim_get_current_buf
 local augroup = api.nvim_create_augroup
 local autocmd = api.nvim_create_autocmd
 
+---@class ASTNode
+---@field role string
+---@field kind string
+---@field detail? string
+---@field arcana? string
+---@field range lsp.Range
+---@field children? ASTNode[]
+
 ---@class ClangdAST
 local M = {}
 
@@ -82,7 +90,7 @@ local function describe(role, kind, detail)
     return (icon .. str), detailpos
 end
 
----@param node table
+---@param node ASTNode
 ---@param visited table
 ---@param result table
 ---@param padding string
