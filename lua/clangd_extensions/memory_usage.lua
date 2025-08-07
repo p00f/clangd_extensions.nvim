@@ -3,11 +3,11 @@ local nvim_get_current_buf = api.nvim_get_current_buf
 local fmt = string.format
 local ceil = math.ceil
 
----@class MemoryUsageSpec
+---@class MemoryTreeSpec
 ---@field _total number
 ---@field _self number
 
----@alias lsp.MemoryUsage table<string, MemoryUsageSpec>|MemoryUsageSpec
+---@alias MemoryTree table<string, MemoryTreeSpec>|MemoryTreeSpec
 
 ---@param lines string[]
 local function display(lines)
@@ -59,7 +59,7 @@ local function format_name(name)
     return name
 end
 
----@param node lsp.MemoryUsage
+---@param node MemoryTree
 ---@param visited table
 ---@param result table
 ---@param padding string
