@@ -5,10 +5,17 @@ local nvim_get_current_buf = api.nvim_get_current_buf
 local type_hierarchy_augroup =
     api.nvim_create_augroup("ClangdTypeHierarchy", {})
 
+---@class ClangdTypeHierarchy
 local M = {}
 M.type_to_location = {}
 M.offset_encoding = {}
 
+---@param node table
+---@param visited table|unknown
+---@param result table|unknown
+---@param padding string
+---@param type_to_location table
+---@return table|unknown result
 local function format_tree(node, visited, result, padding, type_to_location)
     visited[node.data] = true
     table.insert(
@@ -33,19 +40,17 @@ local function format_tree(node, visited, result, padding, type_to_location)
         end
     end
 
-    if node.children then
-        if #node.children > 0 then
-            table.insert(result, padding .. "   Children:")
-            for _, child in pairs(node.children) do
-                if not visited[child.data] then
-                    format_tree(
-                        child,
-                        visited,
-                        result,
-                        padding .. "   ",
-                        type_to_location
-                    )
-                end
+    if node.children and #node.children > 0 then
+        table.insert(result, padding .. "   Children:")
+        for _, child in pairs(node.children) do
+            if not visited[child.data] then
+                format_tree(
+                    child,
+                    visited,
+                    result,
+                    padding .. "   ",
+                    type_to_location
+                )
             end
         end
     end
@@ -53,6 +58,7 @@ local function format_tree(node, visited, result, padding, type_to_location)
     return result
 end
 
+---@type lsp.Handler
 local function handler(err, TypeHierarchyItem, ctx)
     if err or not TypeHierarchyItem then return end
 
@@ -61,7 +67,8 @@ local function handler(err, TypeHierarchyItem, ctx)
     local source_win = api.nvim_get_current_win()
 
     -- Init
-    M.offset_encoding[client_id] = vim.lsp.get_clients({ id = client_id })[1].offset_encoding
+    M.offset_encoding[client_id] =
+        vim.lsp.get_clients({ id = client_id })[1].offset_encoding
     vim.cmd.split(fmt("%s: type hierarchy", TypeHierarchyItem.name))
     local bufnr = nvim_get_current_buf()
     M.type_to_location[bufnr] = {}
@@ -138,7 +145,7 @@ function M.show_hierarchy()
                 line = vim.fn.getcurpos()[2] - 1,
                 character = vim.fn.getcurpos()[3] - 1,
             },
-            -- TODO make these configurable (config + command args)
+            -- TODO: make these configurable (config + command args)
             resolve = 3,
             direction = 2,
         },

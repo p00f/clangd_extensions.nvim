@@ -3,6 +3,13 @@ local nvim_get_current_buf = api.nvim_get_current_buf
 local fmt = string.format
 local ceil = math.ceil
 
+---@class MemoryTreeSpec
+---@field _total number
+---@field _self number
+
+---@alias MemoryTree table<string, MemoryTreeSpec>|MemoryTreeSpec
+
+---@param lines string[]
 local function display(lines)
     for k, line in pairs(lines) do -- Pad lines
         if k ~= 1 then lines[k] = "  " .. line .. "  " end
@@ -41,6 +48,8 @@ local function display(lines)
     })
 end
 
+---@param name string
+---@return string name
 local function format_name(name)
     if name:sub(1, 7) == "file://" then name = vim.uri_to_fname(name) end
     local cwd = vim.fn.getcwd()
@@ -50,6 +59,13 @@ local function format_name(name)
     return name
 end
 
+---@param node MemoryTree
+---@param visited table
+---@param result table
+---@param padding string
+---@param prefix string
+---@param expand_preamble boolean
+---@return table result
 local function format_tree(
     node,
     visited,
@@ -97,13 +113,18 @@ local function format_tree(
     return result
 end
 
+---@param err lsp.ResponseError
+---@param result any
+---@param expand_preamble boolean
 local function handler(err, result, expand_preamble)
     if err then return end
     display(format_tree(result, {}, { "" }, "", "", expand_preamble))
 end
 
+---@class ClangdMemUsage
 local M = {}
 
+---@param expand_preamble boolean
 function M.show_memory_usage(expand_preamble)
     require("clangd_extensions.utils").buf_request_method(
         "$/memoryUsage",
