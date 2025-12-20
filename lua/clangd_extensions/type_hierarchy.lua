@@ -1,4 +1,3 @@
-local symbol_kind = require("clangd_extensions.symbol_kind")
 local api = vim.api
 local nvim_get_current_buf = api.nvim_get_current_buf
 local type_hierarchy_augroup =
@@ -10,12 +9,13 @@ M.type_to_location = {}
 M.offset_encoding = {}
 
 ---@param node Clangd.TypeHierarchyItem
----@param visited table|unknown
----@param result table|unknown
+---@param visited table
+---@param result table
 ---@param padding string
 ---@param type_to_location table
----@return table|unknown result
+---@return table result
 local function format_tree(node, visited, result, padding, type_to_location)
+    local symbol_kind = require("clangd_extensions.symbol_kind")
     visited[node.data] = true
     table.insert(
         result,
@@ -75,13 +75,7 @@ local function handler(err, result, ctx)
     M.type_to_location[bufnr] = {}
 
     -- Set content
-    local lines = format_tree(
-        result,
-        {},
-        {},
-        "",
-        M.type_to_location[bufnr]
-    )
+    local lines = format_tree(result, {}, {}, "", M.type_to_location[bufnr])
     api.nvim_buf_set_lines(bufnr, 0, -1, true, lines)
 
     -- Set options

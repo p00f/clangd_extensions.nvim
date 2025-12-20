@@ -1,5 +1,5 @@
----@class ClangdExt.SymbolKind
-return {
+---@type table
+local symbol_kind = {
     "File",
     "Module",
     "Namespace",
@@ -27,4 +27,5 @@ return {
     "Operator",
     "TypeParameter",
 }
+return symbol_kind
 -- vim: set ts=4 sts=4 sw=4 et ai si sta:
