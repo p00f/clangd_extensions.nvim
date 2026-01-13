@@ -9,23 +9,6 @@ function M.check()
         return
     end
     vim.health.ok("`clangd` found in PATH")
-
-    vim.health.start("Commands Available")
-    local commands = {
-        "ClangdAST",
-        "ClangdMemoryUsage",
-        "ClangdSwitchSourceHeader",
-        "ClangdSymbolInfo",
-        "ClangdTypeHierarchy",
-    }
-    for _, cmd in ipairs(commands) do
-        local msg = ("`%s`"):format(cmd)
-        if vim.is_callable(vim.cmd[cmd]) then
-            vim.health.ok(msg)
-        else
-            vim.health.error(msg)
-        end
-    end
 end
 
 return M
