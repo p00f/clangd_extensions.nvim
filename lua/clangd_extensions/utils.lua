@@ -1,3 +1,5 @@
+---@module 'clangd_extensions.types'
+
 ---@class ClangdExt.Utils
 local M = {}
 
