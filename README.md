@@ -145,20 +145,12 @@ You can fold items using `zc` and friends - the memory usage window has `shiftwi
 
 ## Implementation status of [extensions](https://clangd.llvm.org/extensions)
 
- ☑️ Memory usage
-
- ☑️ AST
-
- ☑️ Symbol info request
-
- ☑️ Type hierarchy
-
- ☑️ Switch between source/header
-
- ☑️ File status (see [`lsp-status.nvim`](https://github.com/nvim-lua/lsp-status.nvim))
-
- ☑️ Compilation commands (can be specified in either `vim.lsp.config()` or [`nvim-lspconfig`](https://github.com/neovim/nvim-lspconfig) through `init_options` and `settings` respectively)
-
- ☑️ Code completion scores
-
- ⬜ Force diagnostics generation (not sure)
+- [X] Memory usage
+- [X] AST
+- [X] Symbol info request
+- [X] Type hierarchy
+- [X] Switch between source/header
+- [X] File status (see [`lsp-status.nvim`](https://github.com/nvim-lua/lsp-status.nvim))
+- [X] Compilation commands (can be specified in either `vim.lsp.config()` or [`nvim-lspconfig`](https://github.com/neovim/nvim-lspconfig) through `init_options` and `settings` respectively)
+- [X] Code completion scores
+- [ ] Force diagnostics generation (not sure)
