@@ -11,10 +11,10 @@ M.offset_encoding = {}
 
 ---@param node Clangd.TypeHierarchyItem
 ---@param visited table
----@param result table
+---@param result string[]
 ---@param padding string
 ---@param type_to_location table
----@return table result
+---@return string[] result
 local function format_tree(node, visited, result, padding, type_to_location)
     utils.validate({
         node = { node, { "table" } },
@@ -135,6 +135,7 @@ local function handler(err, result, ctx)
     })
 
     -- Clear `type_to_location` for this buffer when it is wiped out
+    ---@diagnostic disable-next-line:param-type-mismatch
     api.nvim_create_autocmd("BufWipeOut", {
         buffer = bufnr,
         group = type_hierarchy_augroup,

@@ -8,6 +8,7 @@ local augroup = api.nvim_create_augroup
 local autocmd = api.nvim_create_autocmd
 
 ---@class ClangdExt.AST
+---@field window? { buf: integer, win: integer }
 local M = {}
 
 --- node_pos[source_buf][ast_buf][linenum] = { start = start, end = end }
@@ -19,6 +20,13 @@ M.node_pos = {}
 M.detail_pos = {}
 
 M.nsid = vim.api.nvim_create_namespace("clangd_extensions")
+
+function M.close_window()
+    pcall(api.nvim_buf_delete, M.window.buf, { force = true })
+    pcall(api.nvim_win_close, M.window.win, true)
+
+    M.window = nil
+end
 
 ---@param source_buf integer
 ---@param ast_buf integer
@@ -60,8 +68,8 @@ end
 ---@param role string
 ---@param kind string
 ---@param detail? string
----@return string
----@return table|nil
+---@return string description
+---@return nil|{ start: integer, end: integer } detailpos
 local function describe(role, kind, detail)
     utils.validate({
         role = { role, { "string" } },
@@ -70,7 +78,7 @@ local function describe(role, kind, detail)
     })
 
     local icon = icon_prefix(role, kind)
-    local detailpos = nil
+    local detailpos = nil ---@type nil|{ start: integer, end: integer }
     local role_dismiss = {
         "expression",
         "statement",
@@ -100,10 +108,10 @@ end
 
 ---@param node Clangd.ASTNode
 ---@param visited table
----@param result table
+---@param result string[]
 ---@param padding string
----@param hl_bufs table
----@return table result
+---@param hl_bufs { source_buf: integer, ast_buf: integer }
+---@return string[] result
 local function walk_tree(node, visited, result, padding, hl_bufs)
     utils.validate({
         node = { node, { "table" } },
@@ -175,10 +183,19 @@ local function handler(err, ASTNode)
 
     if err or not ASTNode then return end
 
+    if M.window then
+        M.close_window()
+    end
+
     local source_buf = nvim_get_current_buf()
-    vim.cmd.vsplit(("%s: AST"):format(ASTNode.detail))
-    local ast_buf = nvim_get_current_buf()
+    local ast_buf = api.nvim_create_buf(true, false)
+    api.nvim_buf_set_name(ast_buf, ("%s: AST"):format(ASTNode.detail))
     api.nvim_set_option_value("filetype", "ClangdAST", { buf = ast_buf })
+
+    local ast_win = api.nvim_open_win(ast_buf, true, {
+        focusable = true,
+        vertical = true,
+    })
 
     if not M.node_pos[source_buf] then M.node_pos[source_buf] = {} end
 
@@ -193,17 +210,22 @@ local function handler(err, ASTNode)
         { source_buf = source_buf, ast_buf = ast_buf }
     )
     api.nvim_buf_set_lines(ast_buf, 0, -1, true, lines)
-    vim.bo.buftype = "nofile"
-    vim.bo.bufhidden = "wipe"
-    vim.bo.modifiable = false
-    vim.bo.shiftwidth = 2
-    vim.wo.foldmethod = "indent"
-    api.nvim_set_option_value("number", false, { scope = "local" })
-    api.nvim_set_option_value("relativenumber", false, { scope = "local" })
-    api.nvim_set_option_value("spell", false, { scope = "local" })
-    api.nvim_set_option_value("cursorline", false, { scope = "local" })
+    api.nvim_set_option_value("buftype", "nofile", { buf = ast_buf })
+    api.nvim_set_option_value("bufhidden", "wipe", { buf = ast_buf })
+    api.nvim_set_option_value("modifiable", false, { buf = ast_buf })
+    api.nvim_set_option_value("shiftwidth", 2, { buf = ast_buf })
+
+    api.nvim_set_option_value("foldmethod", "indent", { win = ast_win })
+    api.nvim_set_option_value("number", false, { win = ast_win })
+    api.nvim_set_option_value("relativenumber", false, { win = ast_win })
+    api.nvim_set_option_value("spell", false, { win = ast_win })
+    api.nvim_set_option_value("cursorline", false, { win = ast_win })
     setup_hl_autocmd(source_buf, ast_buf)
     highlight_detail(ast_buf)
+
+    vim.keymap.set('n', 'q', M.close_window, { buffer = ast_buf })
+
+    M.window = { buf = ast_buf, win = ast_win }
 end
 
 ---@param source_buf integer
