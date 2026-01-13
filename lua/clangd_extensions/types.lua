@@ -1,3 +1,12 @@
+---@module "cmp"
+
+---Non-legacy validation spec (>=v0.11)
+---@class ValidateSpec
+---@field [1] any
+---@field [2] vim.validate.Validator
+---@field [3]? boolean
+---@field [4]? string
+
 ---@class lsp.Position
 ---@field line number
 ---@field character number

@@ -1,5 +1,6 @@
 local api = vim.api
 local nvim_get_current_buf = api.nvim_get_current_buf
+local utils = require("clangd_extensions.utils")
 local type_hierarchy_augroup =
     api.nvim_create_augroup("ClangdTypeHierarchy", {})
 
@@ -15,6 +16,14 @@ M.offset_encoding = {}
 ---@param type_to_location table
 ---@return table result
 local function format_tree(node, visited, result, padding, type_to_location)
+    utils.validate({
+        node = { node, { "table" } },
+        visited = { visited, { "table" } },
+        result = { result, { "table" } },
+        padding = { padding, { "string" } },
+        type_to_location = { type_to_location, { "table" } },
+    })
+
     local symbol_kind = require("clangd_extensions.symbol_kind")
     visited[node.data] = true
     table.insert(
@@ -61,6 +70,12 @@ end
 ---@param result? Clangd.TypeHierarchyItem
 ---@param ctx lsp.HandlerContext
 local function handler(err, result, ctx)
+    utils.validate({
+        err = { err, { "table", "nil" }, true },
+        result = { result, { "table", "nil" }, true },
+        ctx = { ctx, { "table" } },
+    })
+
     if err or not result then return end
 
     local client_id = ctx.client_id
@@ -130,23 +145,18 @@ end
 function M.show_hierarchy()
     local bufnr = nvim_get_current_buf()
 
-    require("clangd_extensions.utils").buf_request_method(
-        "textDocument/typeHierarchy",
-        {
-            textDocument = {
-                uri = vim.uri_from_bufnr(bufnr),
-            },
-            position = {
-                line = vim.fn.getcurpos()[2] - 1,
-                character = vim.fn.getcurpos()[3] - 1,
-            },
-            -- TODO: make these configurable (config + command args)
-            resolve = 3,
-            direction = 2,
+    utils.buf_request_method("textDocument/typeHierarchy", {
+        textDocument = {
+            uri = vim.uri_from_bufnr(bufnr),
         },
-        handler,
-        bufnr
-    )
+        position = {
+            line = vim.fn.getcurpos()[2] - 1,
+            character = vim.fn.getcurpos()[3] - 1,
+        },
+        -- TODO: make these configurable (config + command args)
+        resolve = 3,
+        direction = 2,
+    }, handler, bufnr)
 end
 
 return M

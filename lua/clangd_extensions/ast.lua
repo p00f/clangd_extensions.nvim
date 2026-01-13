@@ -1,6 +1,7 @@
 local list_contains = vim.list_contains
 local api = vim.api
 local conf = require("clangd_extensions.config").options.ast
+local utils = require("clangd_extensions.utils")
 
 local nvim_get_current_buf = api.nvim_get_current_buf
 local augroup = api.nvim_create_augroup
@@ -22,6 +23,11 @@ M.nsid = vim.api.nvim_create_namespace("clangd_extensions")
 ---@param source_buf integer
 ---@param ast_buf integer
 local function setup_hl_autocmd(source_buf, ast_buf)
+    utils.validate({
+        source_buf = { source_buf, { "number" } },
+        ast_buf = { ast_buf, { "number" } },
+    })
+
     local group = augroup("ClangdExtensions", {})
     autocmd("CursorMoved", {
         group = group,
@@ -39,6 +45,11 @@ end
 ---@param kind string
 ---@return string|"   "
 local function icon_prefix(role, kind)
+    utils.validate({
+        role = { role, { "string" } },
+        kind = { kind, { "string" } },
+    })
+
     if conf.kind_icons[kind] then return conf.kind_icons[kind] .. "  " end
 
     if conf.role_icons[role] then return conf.role_icons[role] .. "  " end
@@ -52,6 +63,12 @@ end
 ---@return string
 ---@return table|nil
 local function describe(role, kind, detail)
+    utils.validate({
+        role = { role, { "string" } },
+        kind = { kind, { "string" } },
+        detail = { detail, { "string", "nil" }, true },
+    })
+
     local icon = icon_prefix(role, kind)
     local detailpos = nil
     local role_dismiss = {
@@ -88,6 +105,14 @@ end
 ---@param hl_bufs table
 ---@return table result
 local function walk_tree(node, visited, result, padding, hl_bufs)
+    utils.validate({
+        node = { node, { "table" } },
+        visited = { visited, { "table" } },
+        result = { result, { "table" } },
+        padding = { padding, { "string" } },
+        hl_bufs = { hl_bufs, { "table" } },
+    })
+
     visited[node] = true
     local str, detpos = describe(node.role, node.kind, node.detail)
     table.insert(result, padding .. str)
@@ -122,6 +147,8 @@ end
 
 ---@param ast_buf integer
 local function highlight_detail(ast_buf)
+    utils.validate({ ast_buf = { ast_buf, { "number" } } })
+
     for linenum, range in pairs(M.detail_pos[ast_buf]) do
         vim.highlight.range(
             ast_buf,
@@ -141,6 +168,11 @@ end
 ---@param err? lsp.ResponseError
 ---@param ASTNode? Clangd.ASTNode
 local function handler(err, ASTNode)
+    utils.validate({
+        err = { err, { "table", "nil" }, true },
+        ASTNode = { ASTNode, { "table", "nil" }, true },
+    })
+
     if err or not ASTNode then return end
 
     local source_buf = nvim_get_current_buf()
@@ -176,12 +208,19 @@ end
 
 ---@param source_buf integer
 function M.clear_highlight(source_buf)
+    utils.validate({ source_buf = { source_buf, { "number" } } })
+
     api.nvim_buf_clear_namespace(source_buf, M.nsid, 0, -1)
 end
 
 ---@param source_buf integer
 ---@param ast_buf integer
 function M.update_highlight(source_buf, ast_buf)
+    utils.validate({
+        source_buf = { source_buf, { "number" } },
+        ast_buf = { ast_buf, { "number" } },
+    })
+
     M.clear_highlight(source_buf)
 
     if nvim_get_current_buf() ~= ast_buf then return end
@@ -207,9 +246,14 @@ end
 ---@param line1 integer
 ---@param line2 integer
 function M.display_ast(line1, line2)
+    utils.validate({
+        line1 = { line1, { "number" } },
+        line2 = { line2, { "number" } },
+    })
+
     local bufnr = nvim_get_current_buf()
 
-    require("clangd_extensions.utils").buf_request_method("textDocument/ast", {
+    utils.buf_request_method("textDocument/ast", {
         textDocument = { uri = vim.uri_from_bufnr(bufnr) },
         range = {
             start = {
