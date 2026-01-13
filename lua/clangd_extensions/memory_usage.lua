@@ -1,6 +1,7 @@
 local api = vim.api
 local nvim_get_current_buf = api.nvim_get_current_buf
 local ceil = math.ceil
+local utils = require("clangd_extensions.utils")
 
 ---@class Clangd.MemoryTreeSpec
 ---@field _total number
@@ -10,6 +11,8 @@ local ceil = math.ceil
 
 ---@param lines string[]
 local function display(lines)
+    utils.validate({ lines = { lines, { "table" } } })
+
     for k, line in ipairs(lines) do -- Pad lines
         if k ~= 1 then lines[k] = "  " .. line .. "  " end
     end
@@ -50,6 +53,8 @@ end
 ---@param name string
 ---@return string name
 local function format_name(name)
+    utils.validate({ name = { name, { "string" } } })
+
     if name:sub(1, 7) == "file://" then name = vim.uri_to_fname(name) end
     local cwd = vim.fn.getcwd()
     if name:sub(1, cwd:len()) == cwd then name = name:sub(cwd:len() + 2, -1) end
@@ -71,6 +76,15 @@ local function format_tree(
     prefix,
     expand_preamble
 )
+    utils.validate({
+        node = { node, { "table" } },
+        visited = { visited, { "table" } },
+        result = { result, { "table" } },
+        padding = { padding, { "string" } },
+        prefix = { prefix, { "string" } },
+        expand_preamble = { expand_preamble, { "boolean" } },
+    })
+
     if padding == "" then
         table.insert(
             result,
@@ -113,6 +127,12 @@ end
 ---@param result? Clangd.MemoryTree
 ---@param expand_preamble boolean
 local function handler(err, result, expand_preamble)
+    utils.validate({
+        err = { err, { "table", "nil" }, true },
+        result = { result, { "table", "nil" }, true },
+        expand_preamble = { expand_preamble, { "boolean" } },
+    })
+
     if err or not result then return end
     display(format_tree(result, {}, { "" }, "", "", expand_preamble))
 end
@@ -122,7 +142,9 @@ local M = {}
 
 ---@param expand_preamble boolean
 function M.show_memory_usage(expand_preamble)
-    require("clangd_extensions.utils").buf_request_method(
+    utils.validate({ expand_preamble = { expand_preamble, { "boolean" } } })
+
+    utils.buf_request_method(
         "$/memoryUsage",
         nil,
         function(err, result) handler(err, result, expand_preamble) end,

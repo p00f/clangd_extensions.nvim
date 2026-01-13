@@ -1,9 +1,15 @@
 local api = vim.api
 local nvim_get_current_buf = api.nvim_get_current_buf
+local utils = require("clangd_extensions.utils")
 
 ---@param err? lsp.ResponseError
 ---@param result? Clangd.SymbolDetails[]
 local function handler(err, result)
+    utils.validate({
+        err = { err, { "table", "nil" }, true },
+        result = { result, { "table", "nil" }, true },
+    })
+
     if err or not result or not result[1] then return end
 
     local name_str = ("name: %s"):format(result[1].name)
@@ -24,7 +30,7 @@ local M = {}
 function M.show_symbol_info()
     local bufnr = nvim_get_current_buf()
 
-    require("clangd_extensions.utils").buf_request_method(
+    utils.buf_request_method(
         "textDocument/symbolInfo",
         {
             textDocument = {

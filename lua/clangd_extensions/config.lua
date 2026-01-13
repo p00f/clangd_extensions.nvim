@@ -1,3 +1,5 @@
+local utils = require("clangd_extensions.utils")
+
 ---@class ClangdExt.Config
 local M = {}
 
@@ -39,6 +41,8 @@ M.options = {
 
 ---@param options? ClangdExt.Opts
 function M.setup(options)
+    utils.validate({ options = { options, { "table", "nil" }, true } })
+
     M.options = vim.tbl_deep_extend("force", {}, M.options, options or {})
 end
 
