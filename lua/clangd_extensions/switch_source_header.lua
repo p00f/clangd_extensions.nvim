@@ -2,6 +2,9 @@ local api = vim.api
 local nvim_get_current_buf = api.nvim_get_current_buf
 local utils = require("clangd_extensions.utils")
 
+---@class ClangdExt.SwitchSourceHeader
+local M = {}
+
 ---@param err? lsp.ResponseError
 ---@param uri? string
 local function handler(err, uri)
@@ -18,15 +21,9 @@ local function handler(err, uri)
         )
         return
     end
-    local file_name = vim.uri_to_fname(uri)
-    vim.api.nvim_cmd({
-        cmd = "edit",
-        args = { file_name },
-    }, {})
-end
 
----@class ClangdExt.SwitchSourceHeader
-local M = {}
+    vim.cmd.edit(vim.uri_to_fname(uri))
+end
 
 function M.switch_source_header()
     local bufnr = nvim_get_current_buf()
