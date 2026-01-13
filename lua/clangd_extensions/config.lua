@@ -40,8 +40,6 @@ M.options = {
 ---@param options? ClangdExt.Opts
 function M.setup(options)
     M.options = vim.tbl_deep_extend("force", {}, M.options, options or {})
-
-    vim.g.clangd_extensions_setup = 1
 end
 
 return M

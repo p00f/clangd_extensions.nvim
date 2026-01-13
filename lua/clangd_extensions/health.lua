@@ -10,14 +10,6 @@ function M.check()
     end
     vim.health.ok("`clangd` found in PATH")
 
-    vim.health.start("Setup")
-
-    if vim.g.clangd_extensions_setup ~= 1 then
-        vim.health.warn("`clangd_extensions.nvim` not configured")
-        return
-    end
-    vim.health.ok("`clangd_extensions.nvim` configured")
-
     vim.health.start("Commands Available")
     local commands = {
         "ClangdAST",
