@@ -2,13 +2,17 @@
 
 Requires Neovim 0.10+
 
+---
+
 ## Installation
 
-Install this plugin using any plugin/package manager or see [`:h packages`](https://neovim.io/doc/user/repeat.html#packages)
+Install this plugin using any plugin/package manager of your liking or see [`:h packages`](https://neovim.io/doc/user/repeat.html#packages).
+
+---
 
 ## Configuration
 
-Set up clangd via [`lspconfig`](https://github.com/neovim/nvim-lspconfig) / `vim.lsp.start()`, as usual.
+Set up clangd via [`nvim-lspconfig`](https://github.com/neovim/nvim-lspconfig) / `vim.lsp.config()`, as usual.
 
 You don't need to call `require("clangd_extensions").setup()` if you like the defaults:
 
@@ -66,6 +70,8 @@ require("clangd_extensions").setup({
 })
 ```
 
+---
+
 ## Features
 
 ### [Switch Between Source / Header](https://clangd.llvm.org/extensions#switch-between-sourceheader)
@@ -93,7 +99,6 @@ Usage with [`nvim-cmp`](https://github.com/hrsh7th/nvim-cmp):
 local cmp = require "cmp"
 cmp.setup {
     -- ... rest of your `nvim-cmp` setup ...
-
     sorting = {
         comparators = {
             cmp.config.compare.offset,
@@ -136,15 +141,16 @@ You can fold items using `zc` and friends - the memory usage window has `shiftwi
 
 `:ClangdMemoryUsage`. Preamble can be large so it is collapsed by default, to expand it use `:ClangdMemoryUsage expand_preamble`
 
+---
+
 ## Implementation status of [extensions](https://clangd.llvm.org/extensions)
 
- ☑️ Memory usage
- ☑️ AST
- ☑️ Symbol info request
- ☑️ Type hierarchy
- ☑️ Switch between source/header
- ☑️ File status (see lsp-status.nvim)
- ☑️ Compilation commands (can be specified in `vim.lsp.start()`/lspconfig `init_options` and `settings`)
- ☑️ Code completion scores
- ⬜ Force diagnostics generation (not sure)
-
+- [X] Memory usage
+- [X] AST
+- [X] Symbol info request
+- [X] Type hierarchy
+- [X] Switch between source/header
+- [X] File status (see [`lsp-status.nvim`](https://github.com/nvim-lua/lsp-status.nvim))
+- [X] Compilation commands (can be specified in either `vim.lsp.config()` or [`nvim-lspconfig`](https://github.com/neovim/nvim-lspconfig) through `init_options` and `settings` respectively)
+- [X] Code completion scores
+- [ ] Force diagnostics generation (not sure)
