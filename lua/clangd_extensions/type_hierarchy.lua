@@ -83,8 +83,9 @@ local function handler(err, result, ctx)
     local source_win = api.nvim_get_current_win()
 
     -- Init
-    M.offset_encoding[client_id] =
-        vim.lsp.get_clients({ id = client_id })[1].offset_encoding
+    local client = vim.lsp.get_clients({ id = client_id })[1]
+    assert(client, "client was nil")
+    M.offset_encoding[client_id] = client.offset_encoding
     vim.cmd.split(("%s: type hierarchy"):format(result.name))
     local bufnr = nvim_get_current_buf()
     M.type_to_location[bufnr] = {}
@@ -113,7 +114,7 @@ local function handler(err, result, ctx)
         syntax clear
         syntax match ClangdTypeName "\( \{2,\}• \)\@<=\w\+\(:\)\@="
         ]])
-    vim.api.nvim_set_hl(0, "ClangdTypeName", { link = "Underlined" })
+    api.nvim_set_hl(0, "ClangdTypeName", { link = "Underlined" })
 
     -- Set keymap
     vim.keymap.set("n", "gd", function()

@@ -2,7 +2,7 @@
 local M = {}
 
 ---Dynamic `vim.validate()` wrapper. Covers both legacy and newer implementations
----@param T table<string, vim.validate.Spec|ValidateSpec>
+---@param T table<string, any>
 function M.validate(T)
     if vim.fn.has("nvim-0.11") ~= 1 then
         ---Filter table to fit legacy standard

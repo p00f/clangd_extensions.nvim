@@ -11,7 +11,7 @@ local function handler(err, uri)
     })
 
     if err or not uri or (uri == "") then
-        vim.api.nvim_echo(
+        api.nvim_echo(
             { { "Corresponding file cannot be determined" } },
             false,
             {}
@@ -19,7 +19,7 @@ local function handler(err, uri)
         return
     end
     local file_name = vim.uri_to_fname(uri)
-    vim.api.nvim_cmd({
+    api.nvim_cmd({
         cmd = "edit",
         args = { file_name },
     }, {})

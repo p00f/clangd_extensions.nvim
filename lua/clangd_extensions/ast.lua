@@ -18,7 +18,7 @@ M.node_pos = {}
 --- position of `detail` in line no. `linenum` of `ast_buf`
 M.detail_pos = {}
 
-M.nsid = vim.api.nvim_create_namespace("clangd_extensions")
+M.nsid = api.nvim_create_namespace("clangd_extensions")
 
 ---@param source_buf integer
 ---@param ast_buf integer
