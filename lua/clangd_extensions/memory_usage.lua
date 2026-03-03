@@ -9,21 +9,35 @@ local utils = require("clangd_extensions.utils")
 
 ---@alias Clangd.MemoryTree table<string, Clangd.MemoryTreeSpec>|Clangd.MemoryTreeSpec
 
+---@class ClangdExt.MemUsage
+---@field window? { buf: integer, win: integer }
+local M = {}
+
+function M.close_window()
+    pcall(api.nvim_buf_delete, M.window.buf, { force = true })
+    pcall(api.nvim_win_close, M.window.win, true)
+
+    M.window = nil
+end
+
 ---@param lines string[]
 local function display(lines)
     utils.validate({ lines = { lines, { "table" } } })
 
+    if M.window then M.close_window() end
+
     for k, line in ipairs(lines) do -- Pad lines
         if k ~= 1 then lines[k] = "  " .. line .. "  " end
     end
-    local vim_width = api.nvim_get_option_value("columns", { scope = "local" })
-    local vim_height = api.nvim_get_option_value("lines", { scope = "local" })
-    local height = ceil(vim_height * 0.7 - 4)
-    local width = ceil(vim_width * 0.7)
-    local row = ceil((vim_height - height) / 2 - 1)
-    local col = ceil((vim_width - width) / 2)
+
     local buf = api.nvim_create_buf(false, true)
-    api.nvim_open_win(buf, true, {
+    api.nvim_buf_set_lines(buf, 0, -1, true, lines)
+
+    local height = ceil(vim.o.lines * 0.7 - 4)
+    local width = ceil(vim.o.columns * 0.7)
+    local row = ceil((vim.o.lines - height) / 2 - 1)
+    local col = ceil((vim.o.columns - width) / 2)
+    local win = api.nvim_open_win(buf, true, {
         style = "minimal",
         relative = "editor",
         width = width,
@@ -32,22 +46,15 @@ local function display(lines)
         col = col,
         border = require("clangd_extensions.config").options.memory_usage.border,
     })
-    vim.wo.foldmethod = "indent"
-    api.nvim_buf_set_lines(buf, 0, -1, true, lines)
+    api.nvim_set_option_value("foldmethod", "indent", { win = win })
     api.nvim_set_option_value("shiftwidth", 2, { buf = buf })
     api.nvim_set_option_value("bufhidden", "wipe", { buf = buf })
     api.nvim_set_option_value("modifiable", false, { buf = buf })
     api.nvim_set_option_value("buftype", "nofile", { buf = buf })
-    vim.keymap.set("n", "q", ":bd<CR>", {
-        noremap = true,
-        silent = true,
-        buffer = buf,
-    })
-    vim.keymap.set("n", "<ESC>", ":bd<CR>", {
-        noremap = true,
-        silent = true,
-        buffer = buf,
-    })
+    vim.keymap.set("n", "q", M.close_window, { buffer = buf })
+    vim.keymap.set("n", "<Esc>", M.close_window, { buffer = buf })
+
+    M.window = { buf = buf, win = win }
 end
 
 ---@param name string
@@ -62,12 +69,12 @@ local function format_name(name)
 end
 
 ---@param node Clangd.MemoryTree
----@param visited table
----@param result table
+---@param visited table<string, boolean>
+---@param result string[]
 ---@param padding string
 ---@param prefix string
 ---@param expand_preamble boolean
----@return table result
+---@return string[] result
 local function format_tree(
     node,
     visited,
@@ -136,9 +143,6 @@ local function handler(err, result, expand_preamble)
     if err or not result then return end
     display(format_tree(result, {}, { "" }, "", "", expand_preamble))
 end
-
----@class ClangdExt.MemUsage
-local M = {}
 
 ---@param expand_preamble boolean
 function M.show_memory_usage(expand_preamble)
