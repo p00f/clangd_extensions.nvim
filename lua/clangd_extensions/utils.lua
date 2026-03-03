@@ -4,34 +4,21 @@ local M = {}
 ---Dynamic `vim.validate()` wrapper. Covers both legacy and newer implementations
 ---@param T table<string, any>
 function M.validate(T)
-    if vim.fn.has("nvim-0.11") ~= 1 then
-        ---Filter table to fit legacy standard
-        ---@cast T table<string, vim.validate.Spec>
-        for name, spec in pairs(T) do
-            while #spec > 3 do
-                table.remove(spec, #spec)
-            end
-
-            T[name] = spec
-        end
-
-        vim.validate(T) ---@diagnostic disable-line: param-type-mismatch,missing-parameter
-        return
-    end
-
-    ---Filter table to fit non-legacy standard
-    ---@cast T table<string, ValidateSpec>
+    local has_011 = vim.fn.has("nvim-0.11") == 1
     for name, spec in pairs(T) do
-        while #spec > 4 do
+        if not has_011 and #spec == 4 then
             table.remove(spec, #spec)
         end
-
         T[name] = spec
     end
 
-    for name, spec in pairs(T) do
-        table.insert(spec, 1, name)
-        vim.validate(unpack(spec)) ---@diagnostic disable-line: param-type-mismatch
+    if has_011 then
+        for name, spec in pairs(T) do
+            table.insert(spec, 1, name)
+            vim.validate(unpack(spec)) ---@diagnostic disable-line:param-type-not-match
+        end
+    else
+        vim.validate(T) ---@diagnostic disable-line:param-type-not-match
     end
 end
 
