@@ -2,37 +2,27 @@
 local M = {}
 
 ---Dynamic `vim.validate()` wrapper. Covers both legacy and newer implementations
----@param T table<string, any>
+---@param T table<string, vim.validate.Spec|ValidateSpec>
 function M.validate(T)
-    if vim.fn.has("nvim-0.11") ~= 1 then
-        ---Filter table to fit legacy standard
-        ---@cast T table<string, vim.validate.Spec>
-        for name, spec in pairs(T) do
-            while #spec > 3 do
-                table.remove(spec, #spec)
-            end
-
-            T[name] = spec
-        end
-
-        vim.validate(T) ---@diagnostic disable-line: param-type-mismatch,missing-parameter
-        return
-    end
-
-    ---Filter table to fit non-legacy standard
-    ---@cast T table<string, ValidateSpec>
+    local max = vim.fn.has("nvim-0.11") == 1 and 3 or 4
     for name, spec in pairs(T) do
-        while #spec > 4 do
+        while #spec > max do
             table.remove(spec, #spec)
         end
-
         T[name] = spec
     end
 
-    for name, spec in pairs(T) do
-        table.insert(spec, 1, name)
-        vim.validate(unpack(spec)) ---@diagnostic disable-line: param-type-mismatch
+    if vim.fn.has("nvim-0.11") == 1 then
+        ---@cast T table<string, ValidateSpec>
+        for name, spec in pairs(T) do
+            table.insert(spec, 1, name)
+            vim.validate(unpack(spec))
+        end
+        return
     end
+
+    ---@cast T table<string, vim.validate.Spec>
+    vim.validate(T)
 end
 
 ---@param method vim.lsp.protocol.Method|Clangd.Method
