@@ -13,16 +13,14 @@ function M.validate(T)
     end
 
     if vim.fn.has("nvim-0.11") == 1 then
-        ---@cast T table<string, ValidateSpec>
         for name, spec in pairs(T) do
             table.insert(spec, 1, name)
-            vim.validate(unpack(spec))
+            vim.validate(unpack(spec)) ---@diagnostic disable-line:param-type-not-match
         end
         return
     end
 
-    ---@cast T table<string, vim.validate.Spec>
-    vim.validate(T)
+    vim.validate(T) ---@diagnostic disable-line:param-type-not-match
 end
 
 ---@param method vim.lsp.protocol.Method|Clangd.Method
