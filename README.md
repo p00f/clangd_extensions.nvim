@@ -1,5 +1,7 @@
 ![clangd](https://user-images.githubusercontent.com/36493671/152692205-837ec826-54d0-4257-9894-cc1a7ac8a114.svg)
 
+[![builds.sr.ht status](https://builds.sr.ht/~chinmay/clangd_extensions.nvim.svg)](https://builds.sr.ht/~chinmay/clangd_extensions.nvim?)
+
 Requires Neovim 0.10+
 
 ---
