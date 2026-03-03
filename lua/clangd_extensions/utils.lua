@@ -15,7 +15,7 @@ function M.validate(T)
             T[name] = spec
         end
 
-        vim.validate(T)
+        vim.validate(T) ---@diagnostic disable-line: param-type-mismatch,missing-parameter
         return
     end
 
@@ -31,11 +31,11 @@ function M.validate(T)
 
     for name, spec in pairs(T) do
         table.insert(spec, 1, name)
-        vim.validate(unpack(spec))
+        vim.validate(unpack(spec)) ---@diagnostic disable-line: param-type-mismatch
     end
 end
 
----@param method vim.lsp.protocol.Method|string
+---@param method vim.lsp.protocol.Method|Clangd.Method
 ---@param params table|nil
 ---@param handler lsp.Handler|fun(...: any): any
 ---@param bufnr integer
@@ -47,9 +47,9 @@ function M.buf_request_method(method, params, handler, bufnr)
         bufnr = { bufnr, { "number" } },
     })
 
-    local clients = vim.lsp.get_clients({ bufnr = bufnr, method = method })
+    local clients = vim.lsp.get_clients({ bufnr = bufnr, method = method }) ---@diagnostic disable-line: param-type-mismatch
     for _, client in ipairs(clients) do
-        client:request(method, params, handler, bufnr)
+        client:request(method, params, handler, bufnr) ---@diagnostic disable-line: param-type-mismatch
     end
 end
 

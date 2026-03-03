@@ -136,7 +136,7 @@ local function handler(err, result, ctx)
     })
 
     -- Clear `type_to_location` for this buffer when it is wiped out
-    api.nvim_create_autocmd("BufWipeOut", {
+    api.nvim_create_autocmd("BufWipeout", {
         buffer = bufnr,
         group = type_hierarchy_augroup,
         callback = function() M.type_to_location[bufnr] = nil end,

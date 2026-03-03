@@ -15,6 +15,16 @@
 ---@field range? lsp.Range
 ---@field children? Clangd.ASTNode[]
 
+---@alias Clangd.Method
+---| "textDocument/ast"
+---| "textDocument/typeHierarchy"
+---| "textDocument/switchSourceHeader"
+---| "textDocument/symbolInfo"
+---| "$/memoryUsage"
+
+---@class Clangd.CompletionItem : lsp.CompletionItem
+---@field score? number Quality of the result independent of fuzzy-match score (>= 0)
+
 ---@class Clangd.SymbolDetails
 ---@field name string
 ---@field containerName string
@@ -33,6 +43,11 @@
 ---@field children? Clangd.TypeHierarchyItem[]
 ---@field data? any
 
+---@class cmp.Cache
+---@class cmp.Context
+---@class cmp.Source
+---@class cmp.MatchingConfig
+
 ---@class cmp.Entry
 ---@field public id integer
 ---@field public cache cmp.Cache
@@ -45,7 +60,7 @@
 ---@field public source_offset integer
 ---@field public source_insert_range lsp.Range
 ---@field public source_replace_range lsp.Range
----@field public completion_item lsp.CompletionItem
+---@field public completion_item Clangd.CompletionItem
 ---@field public item_defaults? lsp.CompletionItemDefaults
 ---@field public resolved_completion_item lsp.CompletionItem|nil
 ---@field public resolved_callbacks fun()[]
