@@ -1,4 +1,4 @@
----@type table
+---@enum Clangd.SymbolKind
 local symbol_kind = {
     "File",
     "Module",
