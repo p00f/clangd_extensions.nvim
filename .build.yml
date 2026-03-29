@@ -1,14 +1,17 @@
-image: debian/sid
+image: nixos/unstable
 packages:
-  - curl
-  - neovim-runtime
+  - nixos.curl
+  - nixos.emmylua-check
+  - nixos.neovim
+  - nixos.jq
 sources:
   - https://git.sr.ht/~chinmay/clangd_extensions.nvim
 tasks:
   - lint: |
-      sudo mkdir -p /usr/share/nvim/runtime/lua/uv
-      curl -Lo /tmp/uv_meta.lua https://raw.githubusercontent.com/neovim/neovim/a8361c3afc5b9281814e9f16a9d4291e095b38fa/runtime/lua/uv/_meta.lua
-      sudo mv /tmp/uv_meta.lua /usr/share/nvim/runtime/lua/uv/_meta.lua
-      curl -L https://github.com/EmmyLuaLs/emmylua-analyzer-rust/releases/download/0.20.0/emmylua_check-linux-x64.tar.gz \
-        | tar -xz
-      ./emmylua_check --warnings-as-errors clangd_extensions.nvim
+      cd clangd_extensions.nvim
+      nvim_runtime="$(nvim --clean --headless -c 'echo $VIMRUNTIME' -c 'q' 2>&1)/lua/"
+      wcurl https://raw.githubusercontent.com/neovim/neovim/a8361c3afc5b9281814e9f16a9d4291e095b38fa/runtime/lua/uv/_meta.lua
+      sudo mv _meta.lua "$nvim_runtime/uv/"
+      jq --arg lib "$nvim_runtime" '.workspace.library = [$lib]' .emmyrc.json > .emmyrc.ci.json
+      mv .emmyrc.ci.json .emmyrc.json
+      emmylua_check --warnings-as-errors .
