@@ -10,8 +10,6 @@ tasks:
   - lint: |
       cd clangd_extensions.nvim
       nvim_runtime="$(nvim --clean --headless -c 'echo $VIMRUNTIME' -c 'q' 2>&1)/lua/"
-      mkdir -p lua/uv
-      wcurl -o lua/uv/_meta.lua https://raw.githubusercontent.com/neovim/neovim/a8361c3afc5b9281814e9f16a9d4291e095b38fa/runtime/lua/uv/_meta.lua
       jq --arg rt "$nvim_runtime" '.workspace.library = [$rt, "lua/"]' .emmyrc.json > .emmyrc.ci.json
       mv .emmyrc.ci.json .emmyrc.json
       emmylua_check --warnings-as-errors .
