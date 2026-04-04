@@ -211,8 +211,7 @@ local function handler(err, ASTNode)
     setup_hl_autocmd(source_buf, ast_buf)
     highlight_detail(ast_buf)
 
-    vim.keymap.set("n", "q",
-    function()
+    vim.keymap.set("n", "q", function()
         pcall(vim.api.nvim_buf_delete, ast_buf, { force = true })
         pcall(vim.api.nvim_win_close, ast_win, true)
     end, { buffer = ast_buf })
