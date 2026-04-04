@@ -30,20 +30,15 @@ local M = {}
 function M.show_symbol_info()
     local bufnr = nvim_get_current_buf()
 
-    utils.buf_request_method(
-        "textDocument/symbolInfo",
-        {
-            textDocument = {
-                uri = vim.uri_from_bufnr(bufnr),
-            },
-            position = {
-                line = vim.fn.getcurpos()[2] - 1,
-                character = vim.fn.getcurpos()[3] - 1,
-            },
+    utils.buf_request_method("textDocument/symbolInfo", {
+        textDocument = {
+            uri = vim.uri_from_bufnr(bufnr),
         },
-        handler,
-        bufnr
-    )
+        position = {
+            line = vim.fn.getcurpos()[2] - 1,
+            character = vim.fn.getcurpos()[3] - 1,
+        },
+    }, handler, bufnr)
 end
 
 return M

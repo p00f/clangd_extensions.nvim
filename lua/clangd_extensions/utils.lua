@@ -6,9 +6,7 @@ local M = {}
 function M.validate(T)
     local has_011 = vim.fn.has("nvim-0.11") == 1
     for name, spec in pairs(T) do
-        if not has_011 and #spec == 4 then
-            table.remove(spec, #spec)
-        end
+        if not has_011 and #spec == 4 then table.remove(spec, #spec) end
         T[name] = spec
     end
 

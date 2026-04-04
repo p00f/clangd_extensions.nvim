@@ -30,14 +30,9 @@ local M = {}
 
 function M.switch_source_header()
     local bufnr = nvim_get_current_buf()
-    utils.buf_request_method(
-        "textDocument/switchSourceHeader",
-        {
-            uri = vim.uri_from_bufnr(bufnr),
-        },
-        handler,
-        bufnr
-    )
+    utils.buf_request_method("textDocument/switchSourceHeader", {
+        uri = vim.uri_from_bufnr(bufnr),
+    }, handler, bufnr)
 end
 
 return M
