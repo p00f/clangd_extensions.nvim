@@ -10,21 +10,13 @@ local utils = require("clangd_extensions.utils")
 ---@alias Clangd.MemoryTree table<string, Clangd.MemoryTreeSpec>|Clangd.MemoryTreeSpec
 
 ---@class ClangdExt.MemUsage
----@field window? { buf: integer, win: integer }
 local M = {}
 
-function M.close_window()
-    pcall(api.nvim_buf_delete, M.window.buf, { force = true })
-    pcall(api.nvim_win_close, M.window.win, true)
-
-    M.window = nil
-end
+function M.close_window() end
 
 ---@param lines string[]
 local function display(lines)
     utils.validate({ lines = { lines, { "table" } } })
-
-    if M.window then M.close_window() end
 
     for k, line in ipairs(lines) do -- Pad lines
         if k ~= 1 then lines[k] = "  " .. line .. "  " end
@@ -51,10 +43,10 @@ local function display(lines)
     api.nvim_set_option_value("bufhidden", "wipe", { buf = buf })
     api.nvim_set_option_value("modifiable", false, { buf = buf })
     api.nvim_set_option_value("buftype", "nofile", { buf = buf })
-    vim.keymap.set("n", "q", M.close_window, { buffer = buf })
-    vim.keymap.set("n", "<Esc>", M.close_window, { buffer = buf })
-
-    M.window = { buf = buf, win = win }
+    vim.keymap.set("n", "q", function()
+        pcall(api.nvim_buf_delete, buf, { force = true })
+        pcall(api.nvim_win_close, win, true)
+    end, { buffer = buf })
 end
 
 ---@param name string
