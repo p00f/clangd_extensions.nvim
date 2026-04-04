@@ -1,7 +1,6 @@
 image: nixos/unstable
 packages:
   - nixos.curl
-  - nixos.emmylua-check
   - nixos.neovim
   - nixos.jq
 sources:
@@ -12,4 +11,4 @@ tasks:
       nvim_runtime="$(nvim --clean --headless -c 'echo $VIMRUNTIME' -c 'q' 2>&1)/lua/"
       jq --arg rt "$nvim_runtime" '.workspace.library = [$rt, "lua/"]' .emmyrc.json > .emmyrc.ci.json
       mv .emmyrc.ci.json .emmyrc.json
-      emmylua_check --warnings-as-errors .
+      nix develop --extra-experimental-features "nix-command flakes" -c emmylua_check --warnings-as-errors .
