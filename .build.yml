@@ -1,6 +1,5 @@
 image: nixos/unstable
 packages:
-  - nixos.curl
   - nixos.neovim
   - nixos.jq
 sources:
