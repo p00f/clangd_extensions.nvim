@@ -6,6 +6,9 @@ packages:
 sources:
   - https://git.sr.ht/~chinmay/clangd_extensions.nvim
 tasks:
+  - format: |
+      cd clangd_extensions.nvim
+      nix develop --extra-experimental-features "nix-command flakes" -c stylua --check .
   - lint: |
       cd clangd_extensions.nvim
       nvim_runtime="$(nvim --clean --headless -c 'echo $VIMRUNTIME' -c 'q' 2>&1)/lua/"

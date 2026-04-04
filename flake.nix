@@ -16,6 +16,7 @@
           default = pkgs.mkShell {
             packages = with pkgs; [
               emmylua-check
+              stylua
             ];
           };
         });
