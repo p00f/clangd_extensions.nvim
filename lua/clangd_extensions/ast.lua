@@ -183,9 +183,7 @@ local function handler(err, ASTNode)
 
     if err or not ASTNode then return end
 
-    if M.window then
-        M.close_window()
-    end
+    if M.window then M.close_window() end
 
     local source_buf = nvim_get_current_buf()
     local ast_buf = api.nvim_create_buf(true, false)
@@ -223,7 +221,7 @@ local function handler(err, ASTNode)
     setup_hl_autocmd(source_buf, ast_buf)
     highlight_detail(ast_buf)
 
-    vim.keymap.set('n', 'q', M.close_window, { buffer = ast_buf })
+    vim.keymap.set("n", "q", M.close_window, { buffer = ast_buf })
 
     M.window = { buf = ast_buf, win = ast_win }
 end

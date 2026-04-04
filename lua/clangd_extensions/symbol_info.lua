@@ -16,22 +16,24 @@ local function handler(err, result)
 
     if err or not result or not result[1] then return end
 
-    if M.window then
-        M.close_window()
-    end
+    if M.window then M.close_window() end
 
     local name_str = ("name: %s"):format(result[1].name)
     local container_str = ("container: %s"):format(result[1].containerName)
 
-    local buf, win = vim.lsp.util.open_floating_preview({ name_str, container_str }, "", {
-        height = 2,
-        width = math.max(name_str:len(), container_str:len()),
-        focusable = false,
-        focus = false,
-        border = require("clangd_extensions.config").options.symbol_info.border,
-    })
+    local buf, win = vim.lsp.util.open_floating_preview(
+        { name_str, container_str },
+        "",
+        {
+            height = 2,
+            width = math.max(name_str:len(), container_str:len()),
+            focusable = false,
+            focus = false,
+            border = require("clangd_extensions.config").options.symbol_info.border,
+        }
+    )
 
-    vim.keymap.set('n', 'q', M.close_window, { buffer = buf })
+    vim.keymap.set("n", "q", M.close_window, { buffer = buf })
     M.window = { buf = buf, win = win }
 end
 
