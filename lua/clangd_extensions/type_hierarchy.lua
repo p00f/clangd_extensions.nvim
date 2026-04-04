@@ -11,10 +11,10 @@ M.offset_encoding = {}
 
 ---@param node Clangd.TypeHierarchyItem
 ---@param visited table
----@param result table
+---@param result string[]
 ---@param padding string
 ---@param type_to_location table
----@return table result
+---@return string[] result
 local function format_tree(node, visited, result, padding, type_to_location)
     utils.validate({
         node = { node, { "table" } },

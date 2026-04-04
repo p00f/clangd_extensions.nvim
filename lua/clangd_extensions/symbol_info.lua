@@ -2,6 +2,9 @@ local api = vim.api
 local nvim_get_current_buf = api.nvim_get_current_buf
 local utils = require("clangd_extensions.utils")
 
+---@class ClangdExt.SymbolInfo
+local M = {}
+
 ---@param err? lsp.ResponseError
 ---@param result? Clangd.SymbolDetails[]
 local function handler(err, result)
@@ -15,17 +18,23 @@ local function handler(err, result)
     local name_str = ("name: %s"):format(result[1].name)
     local container_str = ("container: %s"):format(result[1].containerName)
 
-    vim.lsp.util.open_floating_preview({ name_str, container_str }, "", {
-        height = 2,
-        width = math.max(name_str:len(), container_str:len()),
-        focusable = false,
-        focus = false,
-        border = require("clangd_extensions.config").options.symbol_info.border,
-    })
-end
+    local buf, win = vim.lsp.util.open_floating_preview(
+        { name_str, container_str },
+        "",
+        {
+            height = 2,
+            width = math.max(name_str:len(), container_str:len()),
+            focusable = false,
+            focus = false,
+            border = require("clangd_extensions.config").options.symbol_info.border,
+        }
+    )
 
----@class ClangdExt.SymbolInfo
-local M = {}
+    vim.keymap.set("n", "q", function()
+        pcall(api.nvim_buf_delete, buf, { force = true })
+        pcall(api.nvim_win_close, win, true)
+    end, { buffer = buf })
+end
 
 function M.show_symbol_info()
     local bufnr = nvim_get_current_buf()

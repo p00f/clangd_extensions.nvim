@@ -13,10 +13,10 @@ function M.validate(T)
     if has_011 then
         for name, spec in pairs(T) do
             table.insert(spec, 1, name)
-            vim.validate(unpack(spec)) ---@diagnostic disable-line:param-type-not-match
+            vim.validate(unpack(spec))
         end
     else
-        vim.validate(T) ---@diagnostic disable-line:param-type-not-match
+        vim.validate(T)
     end
 end
 
@@ -32,9 +32,9 @@ function M.buf_request_method(method, params, handler, bufnr)
         bufnr = { bufnr, { "number" } },
     })
 
-    local clients = vim.lsp.get_clients({ bufnr = bufnr, method = method }) ---@diagnostic disable-line: param-type-mismatch
+    local clients = vim.lsp.get_clients({ bufnr = bufnr, method = method })
     for _, client in ipairs(clients) do
-        client:request(method, params, handler, bufnr) ---@diagnostic disable-line: param-type-mismatch
+        client:request(method, params, handler, bufnr)
     end
 end
 
