@@ -1,5 +1,3 @@
----@module 'clangd_extensions.types'
-
 ---@class ClangdExt.Utils
 local M = {}
 
@@ -15,10 +13,10 @@ function M.validate(T)
     if has_011 then
         for name, spec in pairs(T) do
             table.insert(spec, 1, name)
-            vim.validate(unpack(spec)) ---@diagnostic disable-line:param-type-not-match
+            vim.validate(unpack(spec)) ---@diagnostic disable-line:param-type-mismatch
         end
     else
-        vim.validate(T) ---@diagnostic disable-line:param-type-not-match
+        vim.validate(T) ---@diagnostic disable-line:param-type-mismatch
     end
 end
 
