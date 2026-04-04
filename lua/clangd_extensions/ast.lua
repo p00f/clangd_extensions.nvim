@@ -8,7 +8,6 @@ local augroup = api.nvim_create_augroup
 local autocmd = api.nvim_create_autocmd
 
 ---@class ClangdExt.AST
----@field window? { buf: integer, win: integer }
 local M = {}
 
 --- node_pos[source_buf][ast_buf][linenum] = { start = start, end = end }
@@ -20,13 +19,6 @@ M.node_pos = {}
 M.detail_pos = {}
 
 M.nsid = api.nvim_create_namespace("clangd_extensions")
-
-function M.close_window()
-    pcall(api.nvim_buf_delete, M.window.buf, { force = true })
-    pcall(api.nvim_win_close, M.window.win, true)
-
-    M.window = nil
-end
 
 ---@param source_buf integer
 ---@param ast_buf integer
@@ -183,8 +175,6 @@ local function handler(err, ASTNode)
 
     if err or not ASTNode then return end
 
-    if M.window then M.close_window() end
-
     local source_buf = nvim_get_current_buf()
     local ast_buf = api.nvim_create_buf(true, false)
     api.nvim_buf_set_name(ast_buf, ("%s: AST"):format(ASTNode.detail))
@@ -221,9 +211,11 @@ local function handler(err, ASTNode)
     setup_hl_autocmd(source_buf, ast_buf)
     highlight_detail(ast_buf)
 
-    vim.keymap.set("n", "q", M.close_window, { buffer = ast_buf })
-
-    M.window = { buf = ast_buf, win = ast_win }
+    vim.keymap.set("n", "q",
+    function()
+        pcall(vim.api.nvim_buf_delete, ast_buf, { force = true })
+        pcall(vim.api.nvim_win_close, ast_win, true)
+    end, { buffer = ast_buf })
 end
 
 ---@param source_buf integer
