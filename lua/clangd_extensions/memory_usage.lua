@@ -12,8 +12,6 @@ local utils = require("clangd_extensions.utils")
 ---@class ClangdExt.MemUsage
 local M = {}
 
-function M.close_window() end
-
 ---@param lines string[]
 local function display(lines)
     utils.validate({ lines = { lines, { "table" } } })

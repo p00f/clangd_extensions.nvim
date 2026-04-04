@@ -3,7 +3,6 @@ local nvim_get_current_buf = api.nvim_get_current_buf
 local utils = require("clangd_extensions.utils")
 
 ---@class ClangdExt.SymbolInfo
----@field window? { buf: integer, win: integer }
 local M = {}
 
 ---@param err? lsp.ResponseError
@@ -15,8 +14,6 @@ local function handler(err, result)
     })
 
     if err or not result or not result[1] then return end
-
-    if M.window then M.close_window() end
 
     local name_str = ("name: %s"):format(result[1].name)
     local container_str = ("container: %s"):format(result[1].containerName)
@@ -33,15 +30,10 @@ local function handler(err, result)
         }
     )
 
-    vim.keymap.set("n", "q", M.close_window, { buffer = buf })
-    M.window = { buf = buf, win = win }
-end
-
-function M.close_window()
-    pcall(api.nvim_buf_delete, M.window.buf, { force = true })
-    pcall(api.nvim_win_close, M.window.win, true)
-
-    M.window = nil
+    vim.keymap.set("n", "q", function()
+        pcall(api.nvim_buf_delete, buf, { force = true })
+        pcall(api.nvim_win_close, win, true)
+    end, { buffer = buf })
 end
 
 function M.show_symbol_info()
